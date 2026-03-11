@@ -6,6 +6,26 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload this file + `templates/sdd-template.md` as project knowledge
+- **ChatGPT:** Paste into Custom GPT instructions or conversation context
+- **Any LLM:** Say: *"Using these SDD standards, create a Solution Design for: [your project]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [03 — HLD Standards](./03-hld-standards.md) | The technical architecture section of an SDD |
+| [04 — LLD Standards](./04-lld-standards.md) | Detailed design referenced by an SDD |
+| [02 — ADR Standards](./02-adr-standards.md) | Key decisions documented separately as ADRs |
+| [14 — Cost Optimization](./14-cost-optimization.md) | Cost estimation framework for §3.8 |
+| [11 — NFR Checklist](./11-nfr-checklist.md) | Audit tool for NFR section (§3.3) |
+
+---
+
 ## 1. When to Write an SDD
 
 | Situation | SDD Required? |
@@ -134,6 +154,21 @@
 - [ ] Risks have owners and mitigation plans
 - [ ] Implementation plan has phases with dependencies
 - [ ] Out-of-scope section prevents future arguments
+
+---
+
+## 5. Common SDD Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| "PowerPoint architecture" | Beautiful diagrams with no substance behind them | Every diagram MUST have supporting text with specifics |
+| No alternatives section | Looks like a pre-decided rubber stamp | Always evaluate 2-3 options with weighted criteria |
+| Missing cost estimate | Sticker shock during implementation | Rough TCO estimate at SDD stage prevents budget surprises |
+| Everything is in scope | Scope creep guaranteed | Explicit "Out of Scope" section is mandatory |
+| Requirements without IDs | Untraceable, impossible to verify completeness | Every requirement gets FR-XXX or NFR-XXX |
+| "NFRs: high performance" | Meaningless without numbers | Quantify: p95 < 500ms, 99.9% uptime, 1000 req/sec |
+| Timeline without dependencies | Unrealistic parallel execution assumed | Phase dependencies and team ramp-up must be explicit |
+| No risk assessment | Surprised by obvious problems | Identify top 5 risks with mitigation strategies |
 
 ---
 

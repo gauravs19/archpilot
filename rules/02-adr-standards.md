@@ -6,6 +6,16 @@
 
 ---
 
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [00 — Architecture Principles](./00-architecture-principles.md) | Decision-Making Framework (§2) that ADRs implement |
+| [01 — Solution Design](./01-solution-design.md) | SDDs reference ADRs for key decisions |
+| [templates/adr-template.md](../templates/adr-template.md) | Ready-to-fill ADR template |
+
+---
+
 ## How to Use This File
 
 - Feed this to any LLM alongside `templates/adr-template.md`

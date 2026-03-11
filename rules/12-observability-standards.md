@@ -5,6 +5,24 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for observability architecture and monitoring design
+- **Any LLM:** Say: *"Using these observability standards, design the monitoring for: [your service]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [04 — LLD Standards](./04-lld-standards.md) | Observability plan is mandatory LLD section (§3.8) |
+| [09 — Microservices Patterns](./09-microservices-patterns.md) | Distributed tracing across services |
+| [13 — DevOps & CI/CD](./13-devops-cicd.md) | Post-deploy monitoring and alerting |
+| [11 — NFR Checklist](./11-nfr-checklist.md) | 8 observability checks in the audit |
+
+---
+
 ## 1. The Three Pillars of Observability
 
 | Pillar | What | Why | Technology |

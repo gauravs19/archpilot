@@ -6,6 +6,26 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload this file + `templates/hld-template.md` as project knowledge
+- **ChatGPT:** Paste into Custom GPT instructions or conversation context
+- **Any LLM:** Say: *"Using these HLD standards, create an HLD for: [your system]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [01 — Solution Design](./01-solution-design.md) | SDD is the umbrella; HLD is the architecture section |
+| [04 — LLD Standards](./04-lld-standards.md) | LLD provides implementation detail for each HLD component |
+| [08 — Cloud Architecture](./08-cloud-architecture.md) | Cloud deployment details for §2.10 |
+| [11 — NFR Checklist](./11-nfr-checklist.md) | Audit tool for §2.8 NFR Summary |
+| [templates/hld-template.md](../templates/hld-template.md) | Ready-to-fill HLD template |
+
+---
+
 ## 1. When to Write an HLD
 
 | Situation | HLD Required? |

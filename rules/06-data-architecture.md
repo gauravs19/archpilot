@@ -6,6 +6,25 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload as project knowledge for data modeling and storage decisions
+- **Design Reviews:** Reference when reviewing database schemas and data flows
+- **Any LLM:** Say: *"Using these data architecture standards, design the data model for: [your service]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [04 — LLD Standards](./04-lld-standards.md) | DB design is a mandatory LLD section (§3.4.5) |
+| [07 — Security Architecture](./07-security-architecture.md) | Encryption, PII handling, data classification |
+| [10 — Integration Patterns](./10-integration-patterns.md) | CDC, ETL/ELT, event-driven data flows |
+| [14 — Cost Optimization](./14-cost-optimization.md) | Storage tier selection for cost efficiency |
+
+---
+
 ## 1. Data Modeling Principles
 
 ### 1.1 Entity Design Rules
@@ -212,6 +231,21 @@ Read Path:  API ──▶ Query Service ──▶ Read DB (Elasticsearch / Redis
 - Track index usage: drop unused indexes (they slow down writes).
 - Track slow queries (>100ms) and add indexes based on EXPLAIN ANALYZE.
 - Review index strategy with each major feature release.
+
+---
+
+## 7. Common Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| `VARCHAR(255)` for everything | Hides intent, wastes storage | Use appropriate types and sizes specific to each field |
+| No indexes on foreign keys | Slow joins, full table scans | Always index FK columns |
+| Shared database between services | Tight coupling, deployment bottleneck | Each service owns its data store |
+| Auto-increment IDs exposed externally | Enumerable, leaks business info | Use UUIDs for public-facing identifiers |
+| FLOAT for money | Precision loss causes real financial errors | Use integer minor units (cents) + currency code |
+| No data retention policy | Storage costs grow unbounded, compliance risk | Define retention per data type, automate cleanup |
+| Manual DDL in production | Unreproducible, no rollback, drift | All changes via versioned migration scripts |
+| Storing PII without classification | Privacy violations, compliance failure | Tag every PII column, apply masking + encryption |
 
 ---
 

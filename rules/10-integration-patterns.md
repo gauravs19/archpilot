@@ -5,6 +5,24 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for integration architecture and event-driven design
+- **Any LLM:** Say: *"Using these integration patterns, design the integration for: [your systems]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [09 — Microservices Patterns](./09-microservices-patterns.md) | Service communication and saga patterns |
+| [06 — Data Architecture](./06-data-architecture.md) | CDC, ETL/ELT data flow patterns |
+| [05 — API Design](./05-api-design.md) | REST/API standards for sync integrations |
+| [12 — Observability](./12-observability-standards.md) | Tracing across integration boundaries |
+
+---
+
 ## 1. Integration Style Selection
 
 ```

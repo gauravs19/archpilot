@@ -15,6 +15,18 @@
 
 ---
 
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [04 — LLD Standards](./04-lld-standards.md) | Applies these principles at the component level |
+| [03 — HLD Standards](./03-hld-standards.md) | Applies these principles at the system level |
+| [07 — Security Architecture](./07-security-architecture.md) | Expands Security Principles (§5) |
+| [14 — Cost Optimization](./14-cost-optimization.md) | Expands FinOps Principles (§8) |
+| [02 — ADR Standards](./02-adr-standards.md) | Implements Decision-Making Framework (§2) |
+
+---
+
 ## 1. Design Principles
 
 ### 1.1 Separation of Concerns (SoC)

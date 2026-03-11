@@ -90,12 +90,13 @@ archpilot/
 │
 ├── examples/                           # 📄 Sample Outputs
 │   ├── sample-lld.md                   # Notification Service — full LLD example
+│   ├── sample-hld.md                   # E-Commerce Platform — full HLD example
 │   └── sample-adr.md                   # PostgreSQL vs DynamoDB — full ADR example
 │
 └── README.md                           # This file
 ```
 
-**Total: 30 files | ~210 KB of enterprise architecture standards**
+**Total: 31 files | ~240 KB of enterprise architecture standards**
 
 ---
 

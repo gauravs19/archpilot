@@ -14,6 +14,19 @@
 
 ---
 
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [00 — Architecture Principles](./00-architecture-principles.md) | Foundational principles applied at component level |
+| [03 — HLD Standards](./03-hld-standards.md) | Parent HLD that this LLD implements |
+| [05 — API Design](./05-api-design.md) | Detailed API standards for §3.4.4 |
+| [06 — Data Architecture](./06-data-architecture.md) | Database modeling standards for §3.4.5 |
+| [12 — Observability](./12-observability-standards.md) | Observability details for §3.8 |
+| [templates/lld-template.md](../templates/lld-template.md) | Ready-to-fill LLD template |
+
+---
+
 ## 1. When to Write an LLD
 
 | Situation | LLD Required? |

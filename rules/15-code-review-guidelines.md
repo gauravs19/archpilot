@@ -5,6 +5,24 @@
 
 ---
 
+## How to Use This File
+
+- **Code Reviews:** Use as a review checklist for pull requests
+- **Any LLM:** Say: *"Using these review guidelines, review this code: [paste code]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [05 — API Design](./05-api-design.md) | API-specific review standards |
+| [07 — Security Architecture](./07-security-architecture.md) | Security review depth |
+| [12 — Observability](./12-observability-standards.md) | Logging and tracing review |
+| [04 — LLD Standards](./04-lld-standards.md) | Design-level review standards |
+
+---
+
 ## 1. Review Priorities
 
 Review in this order of importance:

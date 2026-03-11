@@ -6,6 +6,26 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for security architecture reviews and threat modeling
+- **Design Reviews:** Use the checklists to audit designs for security gaps
+- **Any LLM:** Say: *"Using these security standards, review this design for vulnerabilities: [paste design]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [00 — Architecture Principles](./00-architecture-principles.md) | Security Principles (§5) expanded here |
+| [05 — API Design](./05-api-design.md) | API security, auth headers, rate limiting |
+| [06 — Data Architecture](./06-data-architecture.md) | Data classification, PII handling, encryption |
+| [12 — Observability](./12-observability-standards.md) | Security event logging and audit trails |
+| [11 — NFR Checklist](./11-nfr-checklist.md) | Security section of the NFR audit |
+
+---
+
 ## 1. Core Security Principles
 
 ### 1.1 Zero Trust

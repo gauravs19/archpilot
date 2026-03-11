@@ -6,6 +6,25 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload as project knowledge for API design reviews and generation
+- **Code Reviews:** Reference when reviewing API pull requests
+- **Any LLM:** Say: *"Using these API standards, design the API for: [your service]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [04 — LLD Standards](./04-lld-standards.md) | API spec is a mandatory section (§3.4.4) of every LLD |
+| [07 — Security Architecture](./07-security-architecture.md) | Auth, rate limiting, input validation details |
+| [10 — Integration Patterns](./10-integration-patterns.md) | API Gateway and BFF patterns |
+| [15 — Code Review](./15-code-review-guidelines.md) | API-specific review checks |
+
+---
+
 ## 1. General API Principles
 
 ### 1.1 Consumer-First Design

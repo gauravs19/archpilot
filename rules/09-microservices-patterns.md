@@ -6,6 +6,24 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for microservices decomposition and design
+- **Any LLM:** Say: *"Using these microservices patterns, design the architecture for: [your system]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [10 — Integration Patterns](./10-integration-patterns.md) | Inter-service communication patterns |
+| [09 — Microservices Patterns](./09-microservices-patterns.md) | Saga references cross-linked here |
+| [12 — Observability](./12-observability-standards.md) | Distributed tracing for microservices |
+| [08 — Cloud Architecture](./08-cloud-architecture.md) | Container/serverless deployment |
+
+---
+
 ## 1. When to Use Microservices (Decision Framework)
 
 ### Use Microservices When:

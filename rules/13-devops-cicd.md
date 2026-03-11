@@ -5,6 +5,24 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for CI/CD pipeline design and deployment strategy
+- **Any LLM:** Say: *"Using these DevOps standards, design the CI/CD pipeline for: [your project]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [08 — Cloud Architecture](./08-cloud-architecture.md) | Infrastructure and container deployment |
+| [12 — Observability](./12-observability-standards.md) | Post-deploy monitoring and alerting |
+| [07 — Security Architecture](./07-security-architecture.md) | Security scanning in pipeline |
+| [15 — Code Review](./15-code-review-guidelines.md) | PR standards that feed into CI |
+
+---
+
 ## 1. CI/CD Pipeline Standards
 
 ### 1.1 Pipeline Stages (Minimum)

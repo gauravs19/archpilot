@@ -6,6 +6,24 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for cloud cost estimation and optimization reviews
+- **Any LLM:** Say: *"Using these FinOps standards, estimate the TCO for: [your architecture]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [08 — Cloud Architecture](./08-cloud-architecture.md) | Compute, storage, and networking choices |
+| [00 — Architecture Principles](./00-architecture-principles.md) | FinOps Principles (§8) expanded here |
+| [03 — HLD Standards](./03-hld-standards.md) | Cost estimate section of HLD |
+| [01 — Solution Design](./01-solution-design.md) | TCO section (§3.8) of SDD |
+
+---
+
 ## 1. FinOps Principles
 
 ### 1.1 Core Rules

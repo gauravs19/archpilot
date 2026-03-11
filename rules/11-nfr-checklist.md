@@ -13,6 +13,17 @@
 
 ---
 
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [04 — LLD Standards](./04-lld-standards.md) | Use this checklist to audit LLD designs |
+| [03 — HLD Standards](./03-hld-standards.md) | Audit HLD NFR summary section |
+| [12 — Observability](./12-observability-standards.md) | Detailed standards for Observability checks |
+| [07 — Security Architecture](./07-security-architecture.md) | Detailed standards for Security checks |
+
+---
+
 ## 1. Performance (15 Checks)
 
 | # | Check | Severity |

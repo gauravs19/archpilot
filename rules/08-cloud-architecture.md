@@ -5,6 +5,24 @@
 
 ---
 
+## How to Use This File
+
+- **Claude Projects:** Upload for cloud infrastructure design and migration planning
+- **Any LLM:** Say: *"Using these cloud standards, design the cloud architecture for: [your system]"*
+
+---
+
+## Related Standards
+
+| Standard | Relationship |
+|----------|-------------|
+| [03 — HLD Standards](./03-hld-standards.md) | Deployment architecture section of HLD |
+| [13 — DevOps & CI/CD](./13-devops-cicd.md) | Pipeline and deployment patterns |
+| [14 — Cost Optimization](./14-cost-optimization.md) | Cloud cost governance |
+| [07 — Security Architecture](./07-security-architecture.md) | Network security, IAM, encryption |
+
+---
+
 ## 1. Cloud-Native Design Principles
 
 ### 1.1 The Twelve-Factor App (Mandatory)
