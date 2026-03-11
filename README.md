@@ -19,6 +19,41 @@ Archpilot is a **repository of rule files, templates, and AI instructions** that
 
 ---
 
+## 🏗️ How it Works (Logical View)
+
+```mermaid
+graph TD
+    subgraph Repository ["Archpilot Standards Library"]
+        Rules["🧠 Rule Files (Design Standards)"]
+        Templates["📝 Document Templates (Structure)"]
+        Personas["🎭 Personas (Expertise & Tone)"]
+        LLMConfigs["🤖 Platform Configs (Instructions)"]
+    end
+
+    subgraph LLMAI ["AI Foundation (The Brain)"]
+        AI["Claude / GPT-4 / Gemini / LLama"]
+    end
+
+    subgraph Output ["Enterprise Deliverables"]
+        LLD["Low-Level Design (LLD)"]
+        HLD["High-Level Design (HLD)"]
+        ADR["Decision Records (ADR)"]
+        Code["Standardized Code Patterns"]
+    end
+
+    Rules -->|Context| AI
+    Templates -->|Structure| AI
+    Personas -->|Behavior| AI
+    LLMConfigs -->|Protocol| AI
+
+    AI --> LLD
+    AI --> HLD
+    AI --> ADR
+    AI --> Code
+```
+
+---
+
 ## 🚀 Quick Start (2 Minutes)
 
 ### Option A: Claude Projects
