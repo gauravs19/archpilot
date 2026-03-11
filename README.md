@@ -191,39 +191,32 @@ archpilot/
 
 ---
 
-## 🎯 Example Use Cases
+## 🔥 Example Prompts (How to Use)
 
-### 1. Generate an LLD
-Upload `rules/04-lld-standards.md` + `templates/lld-template.md`, then ask:
-> *"Create an LLD for a payment processing service. Context: handles credit card payments via Stripe, must be PCI-DSS compliant, expected 10K transactions/day."*
+### 1. The Direct Standard (LLM-Agnostic)
+If you aren't using a "Project" or "Custom GPT", use this prefix:
+> *"Follow these standards: [Paste content of rules/05-api-design.md]. Now create the API specification for a Loyalty Program service."*
 
-### 2. Create an HLD
-Upload `rules/03-hld-standards.md` + `templates/hld-template.md`, then ask:
-> *"Create an HLD for an e-commerce platform. Expected: 50K daily users, multi-tenant, AWS deployment."*
+### 2. High-Level Design (HLD)
+> *"Follow these standards: [Upload rules/03-hld-standards.md]. Now create an HLD for a Global Logistics Platform. Focus on C4 Container diagrams and address multi-region availability."*
 
-### 3. Write a Solution Design
-Upload `rules/01-solution-design.md` + `templates/sdd-template.md`, then ask:
-> *"Write an SDD for migrating a legacy monolith to microservices. Budget: $200K, timeline: 6 months."*
+### 3. Estimation & Planning (Phase 4)
+> *"Follow these standards: [Upload rules/16-estimation-framework.md]. Estimate the effort for building a 'Real-time Fraud Detection' engine. Use PERT analysis and include complexity multipliers for high-security environments."*
 
-### 4. Create an ADR
-Upload `rules/02-adr-standards.md` + `templates/adr-template.md`, then ask:
-> *"Create an ADR for choosing between PostgreSQL and DynamoDB for a multi-tenant SaaS app."*
+### 4. Legacy Migration (Phase 4)
+> *"Follow these standards: [Upload rules/17-migration-modernization.md]. Propose a migration strategy for a 15-year old COBOL monolith to a Node.js microservice architecture. Use the Strangler Fig pattern."*
 
-### 5. Audit a Design
-Upload `rules/11-nfr-checklist.md`, then ask:
-> *"Audit this design against the NFR checklist: [paste your HLD/LLD]"*
+### 5. Multi-Tenant SaaS (Phase 5)
+> *"Follow these standards: [Upload rules/22-multi-tenancy.md]. Design the database isolation model for a B2B CRM. We need to balance strict data isolation with cost efficiency for 10,000 small tenants."*
 
-### 6. Review Security
-Upload `rules/07-security-architecture.md`, then ask:
-> *"Review this API design for security vulnerabilities: [paste your API spec]"*
+### 6. Domain-Driven Design (Phase 5)
+> *"Follow these standards: [Upload rules/25-domain-driven-design.md]. Conduct a virtual Event Storming session for an Insurance Claims process. Identify bounded contexts and core aggregates."*
 
-### 7. Estimate Cloud Costs
-Upload `rules/14-cost-optimization.md`, then ask:
-> *"Estimate the 3-year TCO for: 3 EKS services, 2 RDS instances, Redis, S3, CloudFront on AWS."*
+### 7. AI/ML MLOps (Phase 5)
+> *"Follow these standards: [Upload rules/26-ai-ml-architecture.md]. Design the MLOps pipeline for a real-time recommendation engine. Include feature store integration and model drift monitoring."*
 
-### 8. Design Microservices
-Upload `rules/09-microservices-patterns.md` + `rules/10-integration-patterns.md`, then ask:
-> *"We have a monolithic e-commerce app. Propose a microservices decomposition with integration strategy."*
+### 8. Stakeholder Pitch (Phase 5)
+> *"Follow these standards: [Upload rules/23-stakeholder-communication.md]. Help me pitch the transition from Batch to Event-Driven architecture to our CFO. Focus on TCO reduction and business agility."*
 
 ---
 
