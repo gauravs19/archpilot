@@ -317,7 +317,7 @@ We welcome contributions! Whether it's a new rule, a design pattern, or a templa
 
 ---
 
-## � License
+## 📄 License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
