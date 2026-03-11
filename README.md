@@ -1,13 +1,46 @@
 # 🏛️ Archpilot — Enterprise Architecture Standards Library
 
-> **"Co-pilot for Enterprise Architects."**
->
-> A portable, LLM-agnostic collection of architecture rules, templates, and system prompts
-> that standardize how AI generates enterprise-grade design documents.
+> **"Turn any LLM into a Senior Enterprise Architect."**  
+> A standard-as-code library that prevents AI hallucinations by providing 50+ enterprise rules, templates, and personas.
+
+![Archpilot Preview](./archpilot_preview.png)
+
+<div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Architecture](https://img.shields.io/badge/Domain-Enterprise_Architecture-blue.svg)]()
-[![LLM-Ready](https://img.shields.io/badge/LLM-Ready_Rules-brightgreen.svg)]()
+[![Stars](https://img.shields.io/github/stars/gauravs19/archpilot?style=social)](https://github.com/gauravs19/archpilot)
+[![Forks](https://img.shields.io/github/forks/gauravs19/archpilot?style=social)](https://github.com/gauravs19/archpilot)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/gauravs19/archpilot/pulls)
+
+</div>
+
+---
+
+## ⚡ The Pain Point
+
+LLMs are great at code, but they often **hallucinate** architecure:
+- They ignore non-functional requirements (NFRs).
+- They mix up HLD vs LLD vs SDD.
+- They suggest insecure or non-compliant design patterns.
+- They lack a "senior architect" persona.
+
+**Archpilot solves this.** It provides the "guardrails" and "context" any LLM needs to produce production-ready solution designs.
+
+| **Without Archpilot** | **With Archpilot** |
+|:--- |:--- |
+| ❌ Vague, generic designs | ✅ Precision enterprise-grade LLDs |
+| ❌ Security is an afterthought | ✅ Zero-trust by design |
+| ❌ Missing NFRs & TCO | ✅ Comprehensive NFR & Cost audits |
+| ❌ Inconsistent formats | ✅ Standardized templates & ADRs |
+| ❌ "Junior" level suggestions | ✅ Expert Senior Architect guidance |
+
+---
+
+## 🌟 Support the Project
+
+If you find Archpilot useful, please consider:
+- **Giving it a Star** ⭐ — It helps more architects discover these standards.
+- **Forking the Repo** 🍴 — Build your own internal standards library.
 
 ---
 
@@ -277,22 +310,17 @@ If you aren't using a "Project" or "Custom GPT", use this prefix:
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/data-architecture-rules`)
-3. Add your rule file following the existing format
-4. Submit a Pull Request
-
-**Rule file format:**
-- Start with a Purpose block explaining what and how to use
-- Use tables for checklists and comparisons
-- Include anti-patterns section
-- End with the Archpilot footer
+We welcome contributions! Whether it's a new rule, a design pattern, or a template, your input helps the community.
+1. Fork the codebase.
+2. Create a new branch (`feat/your-feature`).
+3. Commit your changes.
+4. Push and open a Pull Request.
 
 ---
 
-## 📜 License
+## � License
 
-Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
