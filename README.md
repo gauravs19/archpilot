@@ -255,55 +255,55 @@ If you aren't using a "Project" or "Custom GPT", use this prefix:
 ## 🏗️ Roadmap
 
 ### ✅ Phase 1 — Core (Complete)
-- [x] Architecture Principles
-- [x] LLD Standards + Template
-- [x] HLD Standards + Template
-- [x] ADR Standards + Template
-- [x] API Design Standards
-- [x] Security Architecture
-- [x] Microservices Patterns
-- [x] NFR Checklist (69 checks)
-- [x] Claude Project Instructions
-- [x] Enterprise Architect Persona
+- Architecture Principles
+- LLD Standards + Template
+- HLD Standards + Template
+- ADR Standards + Template
+- API Design Standards
+- Security Architecture
+- Microservices Patterns
+- NFR Checklist (69 checks)
+- Claude Project Instructions
+- Enterprise Architect Persona
 
 ### ✅ Phase 2 — Extended Standards (Complete)
-- [x] Solution Design Standards + Template
-- [x] Data Architecture Standards
-- [x] Integration Patterns (Event-Driven, CDC, Webhooks, API Gateway)
-- [x] Cloud Architecture Standards (12-Factor, IaC, HA/DR)
-- [x] Observability Standards (Logging, Metrics, Tracing, Alerting)
-- [x] DevOps & CI/CD Standards (Pipelines, Docker, GitOps)
-- [x] Cost Optimization / FinOps
-- [x] Code Review Guidelines
+- Solution Design Standards + Template
+- Data Architecture Standards
+- Integration Patterns (Event-Driven, CDC, Webhooks, API Gateway)
+- Cloud Architecture Standards (12-Factor, IaC, HA/DR)
+- Observability Standards (Logging, Metrics, Tracing, Alerting)
+- DevOps & CI/CD Standards (Pipelines, Docker, GitOps)
+- Cost Optimization / FinOps
+- Code Review Guidelines
 
 ### 📋 Phase 3 — Platform Configs & Examples (Complete)
-- [x] VS Code Copilot Instructions
-- [x] Cursor Rules
-- [x] ChatGPT Custom GPT Config
-- [x] Additional Personas (Security Architect, Presales Solutioner)
-- [x] Example Outputs (Sample LLD, Sample ADR, Sample HLD)
+- VS Code Copilot Instructions
+- Cursor Rules
+- ChatGPT Custom GPT Config
+- Additional Personas (Security Architect, Presales Solutioner)
+- Example Outputs (Sample LLD, Sample ADR, Sample HLD)
 
 ### 🔄 Phase 4 — Lifecycle & Governance (Complete)
-- [x] Estimation Framework (T-shirt, Story Points, FPA, PERT)
-- [x] Migration & Modernization Playbook (Strangler Fig, Dual-Write)
-- [x] Architecture Governance (ARB, Tech Radar)
-- [x] Incident Management & Post-Mortem Standards
-- [x] Testing Strategy (Test Pyramid, Contract, Chaos)
-- [x] Tech Debt Management Framework
-- [x] Go-Live Checklist (80-point template)
-- [x] Operational Runbook, Post-Mortem, RFP Response, Handover templates
-- [x] Startup CTO Persona
-- [x] Example: Migration Plan, Estimation
+- Estimation Framework (T-shirt, Story Points, FPA, PERT)
+- Migration & Modernization Playbook (Strangler Fig, Dual-Write)
+- Architecture Governance (ARB, Tech Radar)
+- Incident Management & Post-Mortem Standards
+- Testing Strategy (Test Pyramid, Contract, Chaos)
+- Tech Debt Management Framework
+- Go-Live Checklist (80-point template)
+- Operational Runbook, Post-Mortem, RFP Response, Handover templates
+- Startup CTO Persona
+- Example: Migration Plan, Estimation
 
 ### 🚀 Phase 5 — Deep Coverage (Complete)
-- [x] Multi-Tenancy Architecture (Silo/Bridge/Pool, SaaS patterns)
-- [x] Stakeholder Communication Guide (STAR-T, audience adaptation)
-- [x] Team Topology (Conway's Law, team types, scaling)
-- [x] Domain-Driven Design (Bounded contexts, aggregates, events)
-- [x] AI/ML Architecture (MLOps, model serving, responsible AI)
-- [x] Capacity Planning & Technology Radar templates
-- [x] Sample SDD (Customer Portal)
-- [x] Mermaid diagrams + Anti-patterns for files 05, 07, 12
+- Multi-Tenancy Architecture (Silo/Bridge/Pool, SaaS patterns)
+- Stakeholder Communication Guide (STAR-T, audience adaptation)
+- Team Topology (Conway's Law, team types, scaling)
+- Domain-Driven Design (Bounded contexts, aggregates, events)
+- AI/ML Architecture (MLOps, model serving, responsible AI)
+- Capacity Planning & Technology Radar templates
+- Sample SDD (Customer Portal)
+- Mermaid diagrams + Anti-patterns for files 05, 07, 12
 
 ---
 
