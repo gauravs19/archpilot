@@ -252,6 +252,19 @@ If you aren't using a "Project" or "Custom GPT", use this prefix:
 
 ---
 
+## 🤖 Active Governance (GitHub Action)
+
+Transform your static standards into an **active auditor**. The [Archpilot Reviewer](https://github.com/gauravs19/archpilot-reviewer) automatically audits design docs in your Pull Requests.
+
+- **🔴 Automated Audits**: Catch architectural gaps (NFRs, Security, Patterns) before they are merged.
+- **🌐 Centralized Rules**: Host rules in `archpilot`, and scan every other repo in your org.
+- **📝 Expert Feedback**: Get senior-level suggestions directly as PR comments.
+
+### Quick Setup:
+Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your repository and set `secrets.OPENAI_API_KEY`.
+
+---
+
 ## 🏗️ Roadmap
 
 ### ✅ Phase 1 — Core (Complete)
