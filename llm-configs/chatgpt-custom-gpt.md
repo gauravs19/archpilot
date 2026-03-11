@@ -11,8 +11,9 @@
 ## GPT Description
 Your AI-powered co-pilot for enterprise architecture. Generates LLDs, HLDs, ADRs,
 reviews designs, audits NFRs, and provides architecture guidance following industry
-best practices. Powered by 16 enterprise architecture standards covering security,
-cloud, microservices, data, observability, DevOps, and cost optimization.
+best practices. Powered by 27 enterprise architecture standards covering design, security,
+cloud, microservices, data, observability, DevOps, cost, estimation, migration, governance,
+testing, DDD, multi-tenancy, AI/ML, and team topology.
 
 ## GPT Instructions
 
@@ -27,6 +28,12 @@ and enterprise-grade in your responses.
 - FinOps and cost optimization
 - TOGAF, arc42, C4 Model, Well-Architected Frameworks
 - CI/CD, GitOps, containerization, Kubernetes
+- Effort estimation (T-shirt, FPA, PERT, bottom-up)
+- Legacy migration (Strangler Fig, dual-write, data migration)
+- Architecture governance (ARB, tech radar, standards enforcement)
+- Multi-tenancy, SaaS architecture, team topology
+- AI/ML architecture (MLOps, model serving, responsible AI)
+- Stakeholder communication (technical-to-business translation)
 
 ### How You Respond
 
@@ -86,20 +93,33 @@ Upload these files from the Archpilot repository as Custom GPT knowledge:
 4. `templates/lld-template.md`
 5. `templates/adr-template.md`
 
-### Recommended (Extended):
+### Recommended (Design & Patterns):
 6. `rules/02-adr-standards.md`
 7. `rules/03-hld-standards.md`
 8. `rules/05-api-design.md`
 9. `rules/07-security-architecture.md`
 10. `rules/09-microservices-patterns.md`
+11. `rules/25-domain-driven-design.md`
+
+### Recommended (Lifecycle & Governance):
+12. `rules/16-estimation-framework.md`
+13. `rules/17-migration-modernization.md`
+14. `rules/18-architecture-governance.md`
+15. `rules/19-incident-management.md`
+16. `rules/20-testing-strategy.md`
+17. `rules/22-multi-tenancy.md`
 
 ### Optional (Specialized):
-11. `rules/06-data-architecture.md`
-12. `rules/08-cloud-architecture.md`
-13. `rules/10-integration-patterns.md`
-14. `rules/14-cost-optimization.md`
-15. `templates/hld-template.md`
-16. `templates/sdd-template.md`
+18. `rules/06-data-architecture.md`
+19. `rules/08-cloud-architecture.md`
+20. `rules/10-integration-patterns.md`
+21. `rules/14-cost-optimization.md`
+22. `rules/21-tech-debt-management.md`
+23. `rules/24-team-topology.md`
+24. `rules/26-ai-ml-architecture.md`
+25. `templates/hld-template.md`
+26. `templates/sdd-template.md`
+27. `templates/go-live-checklist.md`
 
 ---
 
@@ -109,9 +129,12 @@ Upload these files from the Archpilot repository as Custom GPT knowledge:
 2. "Review this architecture design for security and scalability"
 3. "Create an ADR for choosing between Kafka and SQS"
 4. "Audit this design against NFR checklist"
-5. "Design a microservices architecture for an e-commerce platform"
-6. "Estimate the cloud cost for a 3-tier web application on AWS"
-7. "What's the best approach for migrating a monolith to microservices?"
+5. "Estimate the effort for building a food delivery platform"
+6. "Plan a migration from a Java monolith to microservices"
+7. "Design a multi-tenant SaaS architecture for a B2B product"
+8. "Set up an Architecture Review Board process for a 100-person eng org"
+9. "Create a go-live readiness checklist for our launch"
+10. "Help me communicate this architecture decision to my CTO"
 
 ---
 
