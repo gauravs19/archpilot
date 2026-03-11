@@ -284,5 +284,49 @@ Every API MUST have:
 
 ---
 
+## 5. API Request Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant GW as API Gateway
+    participant Auth as Auth Service
+    participant Svc as Microservice
+    participant DB as Database
+    participant Cache as Redis Cache
+
+    C->>GW: POST /api/v1/orders
+    GW->>GW: Rate limit check
+    GW->>Auth: Validate JWT
+    Auth-->>GW: 200 OK (user_id, roles)
+    GW->>Svc: Forward request + user context
+    Svc->>Cache: Check cache
+    Cache-->>Svc: Cache miss
+    Svc->>DB: INSERT order
+    DB-->>Svc: Order created
+    Svc->>Cache: Update cache
+    Svc-->>GW: 201 Created
+    GW-->>C: 201 Created + Location header
+```
+
+---
+
+## 6. Common API Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| **Chatty APIs** | 10+ calls to render one page | BFF pattern or composite endpoints |
+| **God endpoint** | `POST /api/do-everything` with action parameter | Fine-grained RESTful resources |
+| **Ignoring pagination** | Returning 10,000 records in one response | Cursor-based or offset pagination |
+| **Verbs in URLs** | `/api/getUsers`, `/api/createOrder` | Use HTTP methods: `GET /users`, `POST /orders` |
+| **Breaking changes without versioning** | Removing fields, changing types | Additive changes only; use semantic versioning |
+| **Leaking internal data model** | API response = database row | Design API contracts independent of DB schema |
+| **No error standardization** | Different error formats per endpoint | Use RFC 7807 Problem Details consistently |
+| **Authentication via query param** | `?api_key=secret123` in URL (logged everywhere) | Use `Authorization` header |
+| **No rate limiting** | Single client can DoS your API | Per-client rate limits with 429 responses |
+| **Ignoring idempotency** | Duplicate POST creates duplicate orders | Idempotency keys for write operations |
+
+---
+
 *Archpilot — Enterprise Architecture Standards Library*
 *Created by Gaurav Sharma*

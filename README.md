@@ -54,7 +54,7 @@ Archpilot is a **repository of rule files, templates, and AI instructions** that
 
 ```
 archpilot/
-├── rules/                              # 🧠 Architecture Standards & Guidelines (22 files)
+├── rules/                              # 🧠 Architecture Standards & Guidelines (27 files)
 │   ├── 00-architecture-principles.md   # Universal design principles, decision framework
 │   ├── 01-solution-design.md           # SDD standards, when HLD vs LLD vs SDD
 │   ├── 02-adr-standards.md             # ADR writing standards & lifecycle
@@ -76,9 +76,14 @@ archpilot/
 │   ├── 18-architecture-governance.md   # ARB process, tech radar, compliance
 │   ├── 19-incident-management.md       # Incident response, post-mortem, runbooks
 │   ├── 20-testing-strategy.md          # Test pyramid, contract testing, chaos eng
-│   └── 21-tech-debt-management.md      # Debt registry, scoring, paydown strategies
+│   ├── 21-tech-debt-management.md      # Debt registry, scoring, paydown strategies
+│   ├── 22-multi-tenancy.md             # Silo/bridge/pool, tenant isolation, SaaS
+│   ├── 23-stakeholder-communication.md # Audience adaptation, STAR-T, influence
+│   ├── 24-team-topology.md             # Conway's Law, team types, scaling teams
+│   ├── 25-domain-driven-design.md      # Bounded contexts, aggregates, events, DDD
+│   └── 26-ai-ml-architecture.md        # MLOps, model serving, feature stores, AI
 │
-├── templates/                          # 📝 Document Templates (9 files)
+├── templates/                          # 📝 Document Templates (11 files)
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
 │   ├── hld-template.md                 # High-Level Design (14 sections)
 │   ├── sdd-template.md                 # Solution Design Document (11 sections)
@@ -87,7 +92,9 @@ archpilot/
 │   ├── runbook-template.md             # Per-service operational runbook
 │   ├── post-mortem-template.md         # Blameless incident post-mortem
 │   ├── rfp-response-template.md        # Technical proposal / RFP response
-│   └── handover-checklist.md           # System transition / KT checklist
+│   ├── handover-checklist.md           # System transition / KT checklist
+│   ├── capacity-planning.md            # Infrastructure capacity forecast
+│   └── technology-radar.md             # Org technology landscape tracker
 │
 ├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
 │   ├── claude-project-instructions.md  # Ready for Claude Projects
@@ -104,13 +111,14 @@ archpilot/
 │   ├── sample-lld.md                   # Notification Service — full LLD example
 │   ├── sample-hld.md                   # E-Commerce Platform — full HLD example
 │   ├── sample-adr.md                   # PostgreSQL vs DynamoDB — full ADR example
+│   ├── sample-sdd.md                   # Customer Portal — full SDD example
 │   ├── sample-migration-plan.md        # Monolith → Microservices migration plan
 │   └── sample-estimation.md            # Bottom-up effort estimation example
 │
 └── README.md                           # This file
 ```
 
-**Total: 45 files | ~380 KB of enterprise architecture standards**
+**Total: 53 files | ~500 KB of enterprise architecture standards**
 
 ---
 
@@ -140,6 +148,11 @@ archpilot/
 | 19 | **Incident Management** | Severity levels, response process, on-call, post-mortem, runbook standards | ~11 KB |
 | 20 | **Testing Strategy** | Test pyramid, contract testing, performance, chaos engineering, quality gates | ~10 KB |
 | 21 | **Tech Debt Management** | Debt registry, scoring framework, paydown strategies, prevention, metrics | ~9 KB |
+| 22 | **Multi-Tenancy** | Silo/bridge/pool models, tenant isolation, data partitioning, noisy neighbor | ~10 KB |
+| 23 | **Stakeholder Communication** | Audience adaptation, STAR-T framework, tech-to-business translation | ~9 KB |
+| 24 | **Team Topology** | Conway's Law, team types, interaction modes, scaling patterns, ownership | ~9 KB |
+| 25 | **Domain-Driven Design** | Bounded contexts, aggregates, domain events, context mapping, event storming | ~11 KB |
+| 26 | **AI/ML Architecture** | MLOps, model serving, feature stores, monitoring, responsible AI | ~10 KB |
 
 ---
 
@@ -221,6 +234,16 @@ Upload `rules/09-microservices-patterns.md` + `rules/10-integration-patterns.md`
 - [x] Operational Runbook, Post-Mortem, RFP Response, Handover templates
 - [x] Startup CTO Persona
 - [x] Example: Migration Plan, Estimation
+
+### 🚀 Phase 5 — Deep Coverage (Complete)
+- [x] Multi-Tenancy Architecture (Silo/Bridge/Pool, SaaS patterns)
+- [x] Stakeholder Communication Guide (STAR-T, audience adaptation)
+- [x] Team Topology (Conway's Law, team types, scaling)
+- [x] Domain-Driven Design (Bounded contexts, aggregates, events)
+- [x] AI/ML Architecture (MLOps, model serving, responsible AI)
+- [x] Capacity Planning & Technology Radar templates
+- [x] Sample SDD (Customer Portal)
+- [x] Mermaid diagrams + Anti-patterns for files 05, 07, 12
 
 ---
 

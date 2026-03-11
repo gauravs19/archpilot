@@ -242,5 +242,52 @@ Every production service MUST have:
 
 ---
 
+## 7. Observability Pipeline
+
+```mermaid
+graph LR
+    App["Application<br/>Services"]
+    OTel["OpenTelemetry<br/>Collector"]
+    Logs["Log Aggregation<br/>(ELK / CloudWatch)"]
+    Metrics["Metrics Store<br/>(Prometheus / Datadog)"]
+    Traces["Trace Backend<br/>(Jaeger / X-Ray)"]
+    Dash["Dashboards<br/>(Grafana / Datadog)"]
+    Alert["Alerting<br/>(PagerDuty)"]
+
+    App -->|"Structured logs"| OTel
+    App -->|"Metrics (RED/USE)"| OTel
+    App -->|"Trace spans"| OTel
+
+    OTel --> Logs
+    OTel --> Metrics
+    OTel --> Traces
+
+    Logs --> Dash
+    Metrics --> Dash
+    Traces --> Dash
+
+    Metrics -->|"Threshold breach"| Alert
+    Logs -->|"Error spike"| Alert
+```
+
+---
+
+## 8. Observability Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| **Unstructured logs** | `print("error occurred")` — can't search, can't parse | JSON structured logging with correlation IDs |
+| **Log everything at DEBUG** | Storage costs explode, signal lost in noise | INFO in production, DEBUG only when troubleshooting |
+| **No correlation ID** | Can't trace a request across services | Generate at API Gateway, propagate through all services |
+| **Alert fatigue** | 50 alerts/day → all ignored | Every alert must be actionable; tune thresholds ruthlessly |
+| **Monitoring only in production** | Staging issues discovered too late | Same observability in staging as production |
+| **No business metrics** | Can tell CPU is fine, can't tell if orders are failing | Include business KPIs (orders/min, revenue/hour) |
+| **Dashboard without owners** | 20 dashboards, nobody maintains them | Each dashboard has an owner and a review date |
+| **Metrics without context** | "Error rate is 5%" — is that bad? | Establish baselines, define SLOs, alert on deviations |
+| **Logging PII** | Customer email, phone numbers in logs | PII masking rules in the logging pipeline |
+| **No distributed tracing** | "It's slow" but no idea which service | Implement OpenTelemetry tracing across all services |
+
+---
+
 *Archpilot — Enterprise Architecture Standards Library*
 *Created by Gaurav Sharma*

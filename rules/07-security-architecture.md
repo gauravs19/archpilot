@@ -261,5 +261,47 @@ For every new system or feature, assess threats using STRIDE:
 
 ---
 
+## 9. Zero Trust Architecture Flow
+
+```mermaid
+graph LR
+    User["User / Device"]
+    IdP["Identity Provider<br/>(Cognito / Okta)"]
+    WAF["WAF<br/>(AWS WAF)"]
+    GW["API Gateway"]
+    Auth["Auth Middleware"]
+    Svc["Service"]
+    DB["Database<br/>(Encrypted)"]
+    Audit["Audit Log<br/>(CloudTrail)"]
+
+    User -->|"1. Authenticate"| IdP
+    IdP -->|"2. JWT Token"| User
+    User -->|"3. Request + JWT"| WAF
+    WAF -->|"4. Filter malicious"| GW
+    GW -->|"5. Rate limit"| Auth
+    Auth -->|"6. Validate JWT + RBAC"| Svc
+    Svc -->|"7. TLS + RLS"| DB
+    Svc -->|"8. Log every action"| Audit
+```
+
+---
+
+## 10. Security Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| **Secrets in code/config files** | Leaked in git history, visible in CI logs | Secrets manager (AWS SSM, Vault) |
+| **Hardcoded CORS `*`** | Any origin can call your API | Explicit allowlist of origins |
+| **No input validation** | SQL injection, XSS, command injection | Validate and sanitize all inputs at the boundary |
+| **JWT with no expiry** | Stolen token works forever | Short-lived tokens (15 min) + refresh tokens |
+| **Admin endpoints without MFA** | Single credential compromise = full access | MFA for all admin and sensitive operations |
+| **Logging PII/secrets** | Tokens, passwords, SSNs in log files | Structured logging with PII masking |
+| **Security as afterthought** | "We'll add security later" | Threat model in design phase, not pre-launch |
+| **Shared service accounts** | No accountability, can't audit | Individual service identities with least privilege |
+| **Ignoring dependency CVEs** | Known vulnerabilities in production | Automated dependency scanning (Snyk, Dependabot) |
+| **No network segmentation** | Compromised service accesses everything | VPC subnets, security groups, zero trust |
+
+---
+
 *Archpilot — Enterprise Architecture Standards Library*
 *Created by Gaurav Sharma*
