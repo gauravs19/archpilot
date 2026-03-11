@@ -80,13 +80,22 @@ archpilot/
 │
 ├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
 │   ├── claude-project-instructions.md  # Ready for Claude Projects
+│   ├── chatgpt-custom-gpt.md           # ChatGPT Custom GPT configuration
+│   ├── vscode-copilot-instructions.md  # GitHub Copilot (.github/copilot-instructions.md)
+│   ├── cursor-rules.md                 # Cursor IDE (.cursorrules)
 │   └── personas/
-│       └── enterprise-architect.md     # Senior architect persona prompt
+│       ├── enterprise-architect.md     # Senior architect persona
+│       ├── security-architect.md       # Security architecture reviewer
+│       └── presales-solutioner.md      # Presales / proposal persona
+│
+├── examples/                           # 📄 Sample Outputs
+│   ├── sample-lld.md                   # Notification Service — full LLD example
+│   └── sample-adr.md                   # PostgreSQL vs DynamoDB — full ADR example
 │
 └── README.md                           # This file
 ```
 
-**Total: 23 files | ~170 KB of enterprise architecture standards**
+**Total: 30 files | ~210 KB of enterprise architecture standards**
 
 ---
 
@@ -173,12 +182,12 @@ Upload `rules/09-microservices-patterns.md` + `rules/10-integration-patterns.md`
 - [x] Cost Optimization / FinOps
 - [x] Code Review Guidelines
 
-### 📋 Phase 3 — Platform Configs & Examples
-- [ ] VS Code Copilot Instructions
-- [ ] Cursor Rules
-- [ ] ChatGPT Custom GPT Config
-- [ ] Additional Personas (Security Architect, Presales Solutioner)
-- [ ] Example Outputs (Sample LLD, HLD, ADR)
+### 📋 Phase 3 — Platform Configs & Examples (Complete)
+- [x] VS Code Copilot Instructions
+- [x] Cursor Rules
+- [x] ChatGPT Custom GPT Config
+- [x] Additional Personas (Security Architect, Presales Solutioner)
+- [x] Example Outputs (Sample LLD, Sample ADR)
 
 ---
 
