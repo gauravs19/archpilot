@@ -3,7 +3,6 @@
 > **"Turn any LLM into a Senior Enterprise Architect."**  
 > A standard-as-code library that prevents AI hallucinations by providing 50+ enterprise rules, templates, and personas.
 
-![Archpilot Preview](./archpilot_preview.png)
 
 <div align="center">
 
