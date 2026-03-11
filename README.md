@@ -54,7 +54,7 @@ Archpilot is a **repository of rule files, templates, and AI instructions** that
 
 ```
 archpilot/
-├── rules/                              # 🧠 Architecture Standards & Guidelines (16 files)
+├── rules/                              # 🧠 Architecture Standards & Guidelines (22 files)
 │   ├── 00-architecture-principles.md   # Universal design principles, decision framework
 │   ├── 01-solution-design.md           # SDD standards, when HLD vs LLD vs SDD
 │   ├── 02-adr-standards.md             # ADR writing standards & lifecycle
@@ -70,13 +70,24 @@ archpilot/
 │   ├── 12-observability-standards.md   # Logging, metrics, tracing, alerting
 │   ├── 13-devops-cicd.md               # Pipelines, branching, deployments, Docker
 │   ├── 14-cost-optimization.md         # FinOps, TCO, right-sizing, pricing models
-│   └── 15-code-review-guidelines.md    # Architecture-aware code review standards
+│   ├── 15-code-review-guidelines.md    # Architecture-aware code review standards
+│   ├── 16-estimation-framework.md      # T-shirt, story points, FPA, bottom-up, PERT
+│   ├── 17-migration-modernization.md   # Strangler Fig, dual-write, data migration
+│   ├── 18-architecture-governance.md   # ARB process, tech radar, compliance
+│   ├── 19-incident-management.md       # Incident response, post-mortem, runbooks
+│   ├── 20-testing-strategy.md          # Test pyramid, contract testing, chaos eng
+│   └── 21-tech-debt-management.md      # Debt registry, scoring, paydown strategies
 │
-├── templates/                          # 📝 Document Templates (4 files)
+├── templates/                          # 📝 Document Templates (9 files)
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
 │   ├── hld-template.md                 # High-Level Design (14 sections)
 │   ├── sdd-template.md                 # Solution Design Document (11 sections)
-│   └── adr-template.md                 # Architecture Decision Record
+│   ├── adr-template.md                 # Architecture Decision Record
+│   ├── go-live-checklist.md            # 80-point pre-launch verification
+│   ├── runbook-template.md             # Per-service operational runbook
+│   ├── post-mortem-template.md         # Blameless incident post-mortem
+│   ├── rfp-response-template.md        # Technical proposal / RFP response
+│   └── handover-checklist.md           # System transition / KT checklist
 │
 ├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
 │   ├── claude-project-instructions.md  # Ready for Claude Projects
@@ -86,17 +97,20 @@ archpilot/
 │   └── personas/
 │       ├── enterprise-architect.md     # Senior architect persona
 │       ├── security-architect.md       # Security architecture reviewer
-│       └── presales-solutioner.md      # Presales / proposal persona
+│       ├── presales-solutioner.md      # Presales / proposal persona
+│       └── startup-cto.md             # Startup / MVP-first persona
 │
 ├── examples/                           # 📄 Sample Outputs
 │   ├── sample-lld.md                   # Notification Service — full LLD example
 │   ├── sample-hld.md                   # E-Commerce Platform — full HLD example
-│   └── sample-adr.md                   # PostgreSQL vs DynamoDB — full ADR example
+│   ├── sample-adr.md                   # PostgreSQL vs DynamoDB — full ADR example
+│   ├── sample-migration-plan.md        # Monolith → Microservices migration plan
+│   └── sample-estimation.md            # Bottom-up effort estimation example
 │
 └── README.md                           # This file
 ```
 
-**Total: 31 files | ~240 KB of enterprise architecture standards**
+**Total: 45 files | ~380 KB of enterprise architecture standards**
 
 ---
 
@@ -120,6 +134,12 @@ archpilot/
 | 13 | **DevOps & CI/CD** | Pipeline stages, branching, deployments, Docker, GitOps, environments | 8.2 KB |
 | 14 | **Cost Optimization** | FinOps, TCO modeling, right-sizing, pricing models, tagging, governance | 7.1 KB |
 | 15 | **Code Review** | Architecture, security, performance, error handling, testing, observability checks | 6.1 KB |
+| 16 | **Estimation Framework** | T-shirt sizing, story points, FPA, bottom-up WBS, PERT, complexity multipliers | ~10 KB |
+| 17 | **Migration & Modernization** | Legacy assessment, Strangler Fig, dual-write, data migration, coexistence | ~12 KB |
+| 18 | **Architecture Governance** | ARB process, tech radar, standards enforcement, exception handling | ~10 KB |
+| 19 | **Incident Management** | Severity levels, response process, on-call, post-mortem, runbook standards | ~11 KB |
+| 20 | **Testing Strategy** | Test pyramid, contract testing, performance, chaos engineering, quality gates | ~10 KB |
+| 21 | **Tech Debt Management** | Debt registry, scoring framework, paydown strategies, prevention, metrics | ~9 KB |
 
 ---
 
@@ -188,7 +208,19 @@ Upload `rules/09-microservices-patterns.md` + `rules/10-integration-patterns.md`
 - [x] Cursor Rules
 - [x] ChatGPT Custom GPT Config
 - [x] Additional Personas (Security Architect, Presales Solutioner)
-- [x] Example Outputs (Sample LLD, Sample ADR)
+- [x] Example Outputs (Sample LLD, Sample ADR, Sample HLD)
+
+### 🔄 Phase 4 — Lifecycle & Governance (Complete)
+- [x] Estimation Framework (T-shirt, Story Points, FPA, PERT)
+- [x] Migration & Modernization Playbook (Strangler Fig, Dual-Write)
+- [x] Architecture Governance (ARB, Tech Radar)
+- [x] Incident Management & Post-Mortem Standards
+- [x] Testing Strategy (Test Pyramid, Contract, Chaos)
+- [x] Tech Debt Management Framework
+- [x] Go-Live Checklist (80-point template)
+- [x] Operational Runbook, Post-Mortem, RFP Response, Handover templates
+- [x] Startup CTO Persona
+- [x] Example: Migration Plan, Estimation
 
 ---
 
