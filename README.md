@@ -172,7 +172,8 @@ archpilot/
 │       ├── enterprise-architect.md     # Senior architect persona
 │       ├── security-architect.md       # Security architecture reviewer
 │       ├── presales-solutioner.md      # Presales / proposal persona
-│       └── startup-cto.md             # Startup / MVP-first persona
+│       ├── startup-cto.md             # Startup / MVP-first persona
+      └── vibe-code-reviewer.md      # Production review of AI-generated code
 │
 ├── examples/                           # 📄 Sample Outputs
 │   ├── sample-lld.md                   # Notification Service — full LLD example
@@ -220,6 +221,7 @@ archpilot/
 | 24 | **Team Topology** | Conway's Law, team types, interaction modes, scaling patterns, ownership | ~9 KB |
 | 25 | **Domain-Driven Design** | Bounded contexts, aggregates, domain events, context mapping, event storming | ~11 KB |
 | 26 | **AI/ML Architecture** | MLOps, model serving, feature stores, monitoring, responsible AI | ~10 KB |
+| 27 | **AI-Assisted Development** | Auditing AI-generated code: security tells, data integrity, ops failure modes, composition risks | ~14 KB |
 
 ---
 
@@ -249,6 +251,9 @@ If you aren't using a "Project" or "Custom GPT", use this prefix:
 
 ### 8. Stakeholder Pitch (Phase 5)
 > *"Follow these standards: [Upload rules/23-stakeholder-communication.md]. Help me pitch the transition from Batch to Event-Driven architecture to our CFO. Focus on TCO reduction and business agility."*
+
+### 9. AI-Generated Code Review (Phase 6)
+> *"Take on the Vibe Code Reviewer persona: [Upload llm-configs/personas/vibe-code-reviewer.md and rules/27-ai-assisted-development.md]. Review this code for production readiness. Flag issues in order of severity."*
 
 ---
 
@@ -303,7 +308,7 @@ Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your
 - Incident Management & Post-Mortem Standards
 - Testing Strategy (Test Pyramid, Contract, Chaos)
 - Tech Debt Management Framework
-- Go-Live Checklist (80-point template)
+- Go-Live Checklist (80-point template, extended to 90 in Phase 6)
 - Operational Runbook, Post-Mortem, RFP Response, Handover templates
 - Startup CTO Persona
 - Example: Migration Plan, Estimation
@@ -317,6 +322,12 @@ Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your
 - Capacity Planning & Technology Radar templates
 - Sample SDD (Customer Portal)
 - Mermaid diagrams + Anti-patterns for files 05, 07, 12
+
+### ✅ Phase 6 — AI-Assisted Development (Complete)
+- AI-Assisted Development Standards (rules/27) — security, data, ops, and composition failure modes in AI-generated code
+- Vibe Code Reviewer Persona — production review of AI-generated code with severity-ranked output
+- Code Review Guidelines §10 — AI-generated code review checklist
+- Go-Live Checklist §10 — AI-assisted codebase pre-launch gates (90-point total)
 
 ---
 

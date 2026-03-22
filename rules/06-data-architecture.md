@@ -234,7 +234,95 @@ Read Path:  API ──▶ Query Service ──▶ Read DB (Elasticsearch / Redis
 
 ---
 
-## 7. Common Anti-Patterns
+## 7. Concurrency Control
+
+### 7.1 Pattern Selection
+
+| Pattern | When | Postgres Mechanism |
+|---------|------|--------------------|
+| **Optimistic locking** | Read-heavy, conflicts rare, short transactions | `version` column + conditional UPDATE |
+| **Pessimistic locking** | Write-heavy, conflicts frequent, critical correctness | `SELECT FOR UPDATE` |
+| **Atomic update** | Single-table write with a guard condition | UPDATE with WHERE guard + RETURNING |
+| **Advisory lock** | Coordination across tables or external APIs | `pg_try_advisory_xact_lock()` |
+
+### 7.2 Optimistic Locking
+
+Add a `version` integer column. Read it with the row. On update, assert the version hasn't changed.
+
+```sql
+-- Schema
+ALTER TABLE orders ADD COLUMN version INTEGER NOT NULL DEFAULT 0;
+
+-- Read
+SELECT id, status, total, version FROM orders WHERE id = $1;
+
+-- Update — will update 0 rows if another transaction won the race
+UPDATE orders
+SET status = $1, version = version + 1
+WHERE id = $2 AND version = $3
+RETURNING id;
+
+-- If RETURNING returns no row: conflict — retry or surface to user
+```
+
+Use when: inventory updates, account settings, document editing. Not suitable for financial balances (use atomic update instead).
+
+### 7.3 Atomic Update (Financial Operations)
+
+Never read-then-write for balance-sensitive operations. Push the guard condition into the UPDATE:
+
+```sql
+-- ❌ read-then-write — two concurrent transactions both see balance = 100
+SELECT balance FROM wallets WHERE user_id = $1;
+UPDATE wallets SET balance = balance - $2 WHERE user_id = $1;
+
+-- ✅ atomic — the WHERE clause is the concurrency guard
+UPDATE wallets
+SET balance = balance - $2
+WHERE user_id = $1 AND balance >= $2
+RETURNING balance;
+-- No row returned = insufficient balance (another request got there first)
+```
+
+### 7.4 Pessimistic Locking
+
+Use when a transaction spans multiple steps and correctness requires exclusive access:
+
+```sql
+BEGIN;
+SELECT * FROM seats WHERE id = $1 FOR UPDATE;
+-- Other transactions trying to SELECT FOR UPDATE on this row will block here
+UPDATE seats SET status = 'reserved', user_id = $2 WHERE id = $1;
+COMMIT;
+```
+
+**Warning:** `SELECT FOR UPDATE` holds a row lock for the transaction duration. Keep transactions short. Never hold a lock across a network call (e.g., don't lock a row, call a payment API, then commit — the payment API timeout becomes a lock timeout).
+
+### 7.5 Distributed Coordination (Advisory Locks)
+
+When coordinating across tables or with external systems, Postgres advisory locks prevent double-processing without a separate Redis dependency:
+
+```sql
+-- Returns true if lock acquired, false if another transaction holds it
+SELECT pg_try_advisory_xact_lock(hashtext('invoice:' || invoice_id::text));
+-- Lock auto-released at transaction end — no explicit unlock needed
+```
+
+Use when: processing the same webhook from two sources, preventing duplicate job execution, coordinating cross-table operations that can't be expressed as a single UPDATE.
+
+### 7.6 Concurrency Anti-Patterns
+
+| Anti-Pattern | Problem | Fix |
+|-------------|---------|-----|
+| Read balance → check → update | Race window between read and write | Atomic UPDATE with WHERE guard |
+| `SELECT FOR UPDATE` across API call | Lock held during external call timeout | Move external call outside the transaction |
+| Optimistic locking on financial data | Version conflict loses money, not just a retry | Use atomic update instead |
+| Application-level mutex (in-memory) | Breaks under horizontal scaling | Database-level locking |
+| No locking on idempotency key insert | Two concurrent requests both insert | UNIQUE constraint + INSERT ON CONFLICT |
+
+---
+
+## 8. Common Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
 |-------------|---------|-----|

@@ -167,6 +167,42 @@ Every PR MUST include:
 
 ---
 
+## 10. AI-Generated Code Review
+
+When reviewing code known or suspected to be AI-generated, apply these additional checks on top of sections 1–9.
+
+### 10.1 Security Tells
+- [ ] No TypeScript non-null assertions (`!`) on `process.env` lookups — use explicit validation with `process.exit(1)` at startup
+- [ ] `jwt.verify()` specifies `algorithms` option explicitly (algorithm confusion vulnerability)
+- [ ] Deep merge utilities (`_.merge`, `Object.assign`) not used with user-supplied objects without sanitization (prototype pollution)
+- [ ] External URLs sourced from user input pass a hostname allowlist check (SSRF)
+- [ ] `npm audit --audit-level=high` returns clean — AI selects packages from training data, not current CVE databases
+
+### 10.2 Data Integrity Tells
+- [ ] Every `UPDATE`/`DELETE` has a WHERE clause (AI frequently omits these on the happy path)
+- [ ] Concurrent counter/balance mutations use atomic DB operations, not read-modify-write patterns
+- [ ] Multi-tenant queries include `orgId`/`tenantId` scope — not just resource ID alone (IDOR risk)
+- [ ] DB-level constraints (UNIQUE, NOT NULL, CHECK, FK) back all application-layer validations
+
+### 10.3 Error Handling Tells
+- [ ] Catch blocks don't silently swallow errors — they re-throw or return a typed error
+- [ ] Error objects serialized with `.message`, `.stack`, `.cause` — not `JSON.stringify(err)` (which returns `{}`)
+- [ ] Correlation ID propagated via `AsyncLocalStorage` — not generated fresh at each log call site
+
+### 10.4 Ops Tells
+- [ ] `NOT NULL` migration additions use expand-backfill-contract (not `ALTER TABLE ADD COLUMN ... NOT NULL` on populated tables)
+- [ ] Process handles `SIGTERM` with in-flight request drain and DB connection cleanup
+- [ ] App validates all required env vars at startup and calls `process.exit(1)` on missing config
+
+### 10.5 Composition Risk
+- [ ] Integration boundaries between AI-generated modules have explicit runtime schema validation (Zod, Joi)
+- [ ] Error contract is consistent across module boundaries — no mixed throw/null/Result patterns
+- [ ] Modules calling other AI-generated modules don't assume internal contracts — validate inputs explicitly
+
+> See `rules/27-ai-assisted-development.md` for full patterns, examples, and the complete audit checklist.
+
+---
+
 ## 9. Common Review Anti-Patterns
 
 | Anti-Pattern | Problem | Fix |
