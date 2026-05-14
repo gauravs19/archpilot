@@ -121,7 +121,7 @@ graph TD
 
 ```
 archpilot/
-├── rules/                              # 🧠 Architecture Standards & Guidelines (27 files)
+├── rules/                              # 🧠 Architecture Standards & Guidelines (35 files)
 │   ├── 00-architecture-principles.md   # Universal design principles, decision framework
 │   ├── 01-solution-design.md           # SDD standards, when HLD vs LLD vs SDD
 │   ├── 02-adr-standards.md             # ADR writing standards & lifecycle
@@ -148,9 +148,17 @@ archpilot/
 │   ├── 23-stakeholder-communication.md # Audience adaptation, STAR-T, influence
 │   ├── 24-team-topology.md             # Conway's Law, team types, scaling teams
 │   ├── 25-domain-driven-design.md      # Bounded contexts, aggregates, events, DDD
-│   └── 26-ai-ml-architecture.md        # MLOps, model serving, feature stores, AI
+│   ├── 26-ai-ml-architecture.md        # MLOps, model serving, feature stores, AI
+│   ├── 27-spec-driven-development.md   # ⭐ NEW: SDD, EARS notation, Spec-Kit workflow
+│   ├── 28-context-engineering.md       # ⭐ NEW: LLM context design, RAG, token budgets
+│   ├── 29-agentic-ai-governance.md     # ⭐ NEW: Agent safety, HITL, audit, blast radius
+│   ├── 30-platform-engineering.md      # ⭐ NEW: IDP, golden paths, developer portal
+│   ├── 31-api-governance.md            # ⭐ NEW: API lifecycle, productization, DX
+│   ├── 32-data-contracts.md            # ⭐ NEW: Producer/consumer contracts, schema drift
+│   ├── 33-resilience-chaos-engineering.md  # ⭐ NEW: GameDays, fault injection, blast radius
+│   └── 34-sustainability-green-architecture.md  # ⭐ NEW: Carbon-aware, GreenOps, SCI
 │
-├── templates/                          # 📝 Document Templates (11 files)
+├── templates/                          # 📝 Document Templates (16 files)
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
 │   ├── hld-template.md                 # High-Level Design (14 sections)
 │   ├── sdd-template.md                 # Solution Design Document (11 sections)
@@ -161,13 +169,19 @@ archpilot/
 │   ├── rfp-response-template.md        # Technical proposal / RFP response
 │   ├── handover-checklist.md           # System transition / KT checklist
 │   ├── capacity-planning.md            # Infrastructure capacity forecast
-│   └── technology-radar.md             # Org technology landscape tracker
+│   ├── technology-radar.md             # Org technology landscape tracker
+│   ├── spec-template.md                # ⭐ NEW: Spec-Kit requirements.md (EARS notation)
+│   ├── design-spec-template.md         # ⭐ NEW: Spec-Kit design.md (architecture + schemas)
+│   ├── task-list-template.md           # ⭐ NEW: Spec-Kit tasks.md (atomic agent tasks)
+│   ├── constitution-template.md        # ⭐ NEW: Project constitution / AI agent law
+│   └── data-contract-template.md       # ⭐ NEW: Producer/consumer data contract
 │
 ├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
 │   ├── claude-project-instructions.md  # Ready for Claude Projects
 │   ├── chatgpt-custom-gpt.md           # ChatGPT Custom GPT configuration
 │   ├── vscode-copilot-instructions.md  # GitHub Copilot (.github/copilot-instructions.md)
 │   ├── cursor-rules.md                 # Cursor IDE (.cursorrules)
+│   ├── kiro-steering-instructions.md   # ⭐ NEW: AWS Kiro steering file (.kiro/steering/)
 │   └── personas/
 │       ├── enterprise-architect.md     # Senior architect persona
 │       ├── security-architect.md       # Security architecture reviewer
@@ -185,7 +199,7 @@ archpilot/
 └── README.md                           # This file
 ```
 
-**Total: 53 files | ~500 KB of enterprise architecture standards**
+**Total: 67 files | ~750 KB of enterprise architecture standards**
 
 ---
 
@@ -220,6 +234,14 @@ archpilot/
 | 24 | **Team Topology** | Conway's Law, team types, interaction modes, scaling patterns, ownership | ~9 KB |
 | 25 | **Domain-Driven Design** | Bounded contexts, aggregates, domain events, context mapping, event storming | ~11 KB |
 | 26 | **AI/ML Architecture** | MLOps, model serving, feature stores, monitoring, responsible AI | ~10 KB |
+| 27 | ⭐ **Spec-Driven Development** | EARS notation, Spec-Kit triad (requirements/design/tasks), SDD loop, RTM | ~15 KB |
+| 28 | ⭐ **Context Engineering** | LLM context stack, RAG standards, token budgets, multi-agent context routing | ~10 KB |
+| 29 | ⭐ **Agentic AI Governance** | Agent safety, HITL gates, blast radius, audit logs, CI/CD integration | ~10 KB |
+| 30 | ⭐ **Platform Engineering** | IDP capabilities, golden paths, service catalog, developer portal, platform SLOs | ~9 KB |
+| 31 | ⭐ **API Governance** | API lifecycle, versioning policy, DX checklist, API marketplace, OpenAPI linting | ~10 KB |
+| 32 | ⭐ **Data Contracts** | Producer/consumer contracts, YAML schema, compatibility matrix, drift detection | ~11 KB |
+| 33 | ⭐ **Resilience & Chaos Engineering** | GameDays, fault injection, blast radius levels, steady-state hypothesis, chaos loop | ~12 KB |
+| 34 | ⭐ **Sustainability & Green Architecture** | SCI score, carbon-aware scheduling, GreenOps, demand shaping, ARM efficiency | ~9 KB |
 
 ---
 
@@ -317,6 +339,19 @@ Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your
 - Capacity Planning & Technology Radar templates
 - Sample SDD (Customer Portal)
 - Mermaid diagrams + Anti-patterns for files 05, 07, 12
+
+### ⭐ Phase 6 — Spec-Driven & Agentic Era (Complete)
+- **Spec-Driven Development (rule 27):** EARS notation, Spec-Kit triad, SDD loop, RTM, agent prompt patterns
+- **Context Engineering (rule 28):** 5-layer context stack, RAG standards, token budgets, PII-in-context rules
+- **Agentic AI Governance (rule 29):** 5-level autonomy model, HITL gates, blast radius, audit log format
+- **Platform Engineering (rule 30):** IDP capabilities, golden paths, service catalog, platform SLOs
+- **API Governance (rule 31):** Full lifecycle, versioning policy, DX checklist, OpenAPI linting gates
+- **Data Contracts (rule 32):** YAML contract schema, compatibility matrix, drift detection, consumer registration
+- **Resilience & Chaos Engineering (rule 33):** GameDay playbook, 5 blast-radius levels, 7-step chaos loop
+- **Sustainability & Green Architecture (rule 34):** SCI formula, carbon-aware patterns, GreenOps, ARM migration
+- **Spec-Kit Templates:** spec-template.md (EARS), design-spec-template.md, task-list-template.md, constitution-template.md
+- **Data Contract Template:** Fully structured YAML + field definition table
+- **AWS Kiro Steering File:** kiro-steering-instructions.md for native SDD enforcement in Kiro
 
 ---
 
