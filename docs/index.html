@@ -1,0 +1,846 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archpilot — Enterprise Architecture Standards Library</title>
+<meta name="description" content="35+ rule files, templates, and personas that turn any LLM into a Senior Enterprise Architect. Spec-Driven Development, EARS notation, and production-grade standards for Claude, Kiro, Cursor, and Copilot.">
+<meta property="og:title" content="Archpilot — Enterprise Architecture Standards Library">
+<meta property="og:description" content="Turn any LLM into a Senior Enterprise Architect. 35 rules. 16 templates. 5 platforms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A1628;--navy-light:#112240;--blue:#1D4ED8;--blue-light:#2563EB;
+  --gold:#B45309;--gold-light:#D97706;
+  --slate:#475569;--slate-light:#64748B;
+  --border:#E2E8F0;--bg:#FFFFFF;--bg-alt:#F8FAFC;--bg-alt2:#F1F5F9;
+  --text:#0F172A;--text-muted:#64748B;
+  --green:#16A34A;--red:#DC2626;
+  --radius:6px;--radius-lg:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.08),0 4px 6px rgba(0,0,0,.05);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+code,pre{font-family:'JetBrains Mono',monospace}
+
+/* ── LAYOUT ── */
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
+.section{padding:80px 0}
+.section--alt{background:var(--bg-alt)}
+.section--alt2{background:var(--bg-alt2)}
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue-light);margin-bottom:12px}
+.section-title{font-size:2rem;font-weight:800;color:var(--navy);line-height:1.2;margin-bottom:16px}
+.section-sub{font-size:1.05rem;color:var(--slate);max-width:600px;line-height:1.7}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}.grid-4{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;gap:24px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--navy)}
+.nav-logo span{color:var(--blue-light)}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:.875rem;font-weight:500;color:var(--slate);transition:color .15s}
+.nav-links a:hover{color:var(--navy)}
+.nav-cta{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);font-size:.875rem;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
+.btn-primary{background:var(--blue-light);color:#fff}
+.btn-primary:hover{background:var(--blue)}
+.btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--navy);background:var(--bg-alt)}
+.btn-lg{padding:12px 28px;font-size:1rem;border-radius:var(--radius-lg)}
+
+/* ── HERO ── */
+.hero{padding:80px 0 72px;border-bottom:1px solid var(--border)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;font-size:.8rem;font-weight:600;margin-bottom:24px}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#2563EB}
+.hero-title{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800;color:var(--navy);line-height:1.15;margin-bottom:20px;max-width:800px}
+.hero-title em{font-style:normal;color:var(--blue-light)}
+.hero-subtitle{font-size:1.15rem;color:var(--slate);max-width:580px;margin-bottom:36px;line-height:1.75}
+.hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hero-meta{margin-top:48px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+.hero-stat{display:flex;flex-direction:column}
+.hero-stat strong{font-size:1.75rem;font-weight:800;color:var(--navy)}
+.hero-stat span{font-size:.8rem;color:var(--slate-light);font-weight:500}
+.hero-divider{width:1px;height:36px;background:var(--border)}
+.hero-trusted{font-size:.8rem;color:var(--slate-light);font-weight:500}
+.hero-platforms{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
+.platform-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);background:var(--bg);font-size:.78rem;font-weight:500;color:var(--slate)}
+
+/* ── COMPARISON BAR ── */
+.compare-bar{background:var(--navy);color:#fff;padding:40px 0}
+.compare-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:32px;align-items:start}
+.compare-col h3{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;opacity:.6}
+.compare-col.bad h3{color:#FCA5A5}
+.compare-col.good h3{color:#6EE7B7}
+.compare-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:.9rem;opacity:.85}
+.compare-icon{flex-shrink:0;margin-top:2px;font-size:.9rem}
+.compare-divider{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.compare-vs{width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:rgba(255,255,255,.6)}
+@media(max-width:700px){.compare-grid{grid-template-columns:1fr}.compare-divider{display:none}}
+
+/* ── HOW IT WORKS ── */
+.step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.step-grid::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,#BFDBFE,#93C5FD,#60A5FA,#3B82F6);z-index:0}
+.step{position:relative;z-index:1;text-align:center;padding:0 16px}
+.step-num{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-weight:800;font-size:1rem;border:2px solid var(--blue-light);background:#fff;color:var(--blue-light)}
+.step-title{font-weight:700;font-size:.95rem;color:var(--navy);margin-bottom:6px}
+.step-desc{font-size:.82rem;color:var(--slate);line-height:1.5}
+.step-artifact{display:inline-block;margin-top:8px;padding:3px 8px;border-radius:4px;background:#EFF6FF;border:1px solid #BFDBFE;font-size:.72rem;font-weight:600;color:var(--blue);font-family:'JetBrains Mono',monospace}
+@media(max-width:800px){.step-grid{grid-template-columns:1fr 1fr}.step-grid::before{display:none}.step{margin-bottom:24px}}
+@media(max-width:500px){.step-grid{grid-template-columns:1fr}}
+
+/* ── RULE LIBRARY ── */
+.tab-bar{display:flex;gap:2px;background:var(--bg-alt2);border-radius:var(--radius);padding:4px;margin-bottom:28px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:4px;font-size:.82rem;font-weight:500;cursor:pointer;color:var(--slate);border:none;background:transparent;transition:all .15s}
+.tab.active{background:#fff;color:var(--navy);font-weight:600;box-shadow:var(--shadow)}
+.rule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rule-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;cursor:pointer;transition:all .15s}
+.rule-card:hover{border-color:#93C5FD;box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.rule-card.new-badge::after{content:'NEW';position:absolute;top:10px;right:10px;font-size:.6rem;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:99px;background:#DCFCE7;color:#166534}
+.rule-card{position:relative}
+.rule-num{font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--slate-light);margin-bottom:6px}
+.rule-name{font-size:.88rem;font-weight:600;color:var(--navy);line-height:1.3;margin-bottom:4px}
+.rule-desc{font-size:.77rem;color:var(--slate);line-height:1.45}
+@media(max-width:900px){.rule-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.rule-grid{grid-template-columns:1fr}}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* ── SPEC KIT ── */
+.speckit-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.speckit-visual{display:grid;grid-template-columns:1fr;gap:12px}
+.spec-file{border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff;overflow:hidden;box-shadow:var(--shadow)}
+.spec-file-header{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg-alt2);border-bottom:1px solid var(--border)}
+.spec-file-dots{display:flex;gap:5px}
+.spec-file-dots span{width:10px;height:10px;border-radius:50%}
+.spec-file-name{font-size:.78rem;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--slate)}
+.spec-file-body{padding:14px 16px;font-size:.78rem;font-family:'JetBrains Mono',monospace;color:#334155;line-height:1.7}
+.spec-file-body .kw{color:#7C3AED}
+.spec-file-body .str{color:#16A34A}
+.spec-file-body .cmt{color:#94A3B8}
+.spec-feature{display:flex;gap:14px;margin-bottom:20px}
+.spec-icon{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;background:var(--bg-alt2)}
+.spec-feature-text h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+.spec-feature-text p{font-size:.85rem;color:var(--slate);line-height:1.55}
+@media(max-width:900px){.speckit-grid{grid-template-columns:1fr}}
+
+/* ── PLATFORMS ── */
+.platform-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.platform-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;background:#fff;transition:all .2s}
+.platform-card:hover{border-color:var(--blue-light);box-shadow:var(--shadow-md)}
+.platform-card-icon{font-size:1.8rem;margin-bottom:10px}
+.platform-card-name{font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+.platform-card-desc{font-size:.75rem;color:var(--slate);line-height:1.4}
+.platform-card-tag{display:inline-block;margin-top:8px;padding:2px 8px;border-radius:99px;font-size:.68rem;font-weight:600;background:var(--bg-alt2);color:var(--slate)}
+@media(max-width:1000px){.platform-cards{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.platform-cards{grid-template-columns:1fr 1fr}}
+
+/* ── CODE TABS ── */
+.code-panel{background:#0F172A;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg)}
+.code-panel-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.08)}
+.code-panel-tab{padding:10px 18px;font-size:.78rem;font-weight:500;cursor:pointer;color:rgba(255,255,255,.45);border:none;background:transparent;transition:all .15s;border-bottom:2px solid transparent}
+.code-panel-tab.active{color:#fff;border-bottom-color:#3B82F6}
+.code-panel-body{padding:24px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.8;color:#CBD5E1;overflow-x:auto}
+.code-panel-body .hl-key{color:#7DD3FC}
+.code-panel-body .hl-str{color:#6EE7B7}
+.code-panel-body .hl-cmt{color:#475569}
+.code-panel-body .hl-num{color:#FCD34D}
+.code-panel-body .hl-req{color:#F9A8D4}
+.cpanel-content{display:none}.cpanel-content.active{display:block}
+
+/* ── STATS ── */
+.stats-bar{background:var(--navy);padding:48px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;text-align:center}
+.stat-item{padding:0 20px;border-right:1px solid rgba(255,255,255,.1)}
+.stat-item:last-child{border-right:none}
+.stat-val{font-size:2.2rem;font-weight:800;color:#fff;line-height:1}
+.stat-label{font-size:.8rem;color:rgba(255,255,255,.5);margin-top:6px;font-weight:500}
+@media(max-width:800px){.stats-grid{grid-template-columns:repeat(3,1fr)}.stat-item{margin-bottom:24px;border-right:none}}
+
+/* ── USE CASES ── */
+.usecase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.usecase-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;background:#fff;transition:all .2s}
+.usecase-card:hover{box-shadow:var(--shadow-md);border-color:#93C5FD}
+.usecase-icon{font-size:1.5rem;margin-bottom:12px}
+.usecase-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:8px}
+.usecase-desc{font-size:.85rem;color:var(--slate);line-height:1.6;margin-bottom:14px}
+.usecase-rules{display:flex;flex-wrap:wrap;gap:5px}
+.rule-tag{font-size:.7rem;padding:2px 7px;border-radius:99px;background:var(--bg-alt2);color:var(--slate);font-weight:500;border:1px solid var(--border)}
+@media(max-width:800px){.usecase-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.usecase-grid{grid-template-columns:1fr}}
+
+/* ── AUTHOR ── */
+.author-section{display:flex;align-items:center;gap:48px}
+.author-avatar{width:100px;height:100px;border-radius:50%;border:3px solid var(--border);background:#E2E8F0;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.author-quote{font-size:1.05rem;color:var(--slate);line-height:1.75;font-style:italic;margin-bottom:16px}
+.author-name{font-weight:700;color:var(--navy);font-size:.95rem}
+.author-title{font-size:.82rem;color:var(--slate-light)}
+.author-links{display:flex;gap:12px;margin-top:10px}
+.author-link{font-size:.82rem;color:var(--blue-light);font-weight:500}
+@media(max-width:700px){.author-section{flex-direction:column;gap:24px}}
+
+/* ── CTA ── */
+.cta-section{background:var(--navy);color:#fff;padding:80px 0;text-align:center}
+.cta-title{font-size:2.2rem;font-weight:800;margin-bottom:16px;line-height:1.2}
+.cta-sub{font-size:1rem;color:rgba(255,255,255,.6);margin-bottom:36px;max-width:480px;margin-left:auto;margin-right:auto}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-white{background:#fff;color:var(--navy)}
+.btn-white:hover{background:#F1F5F9}
+.btn-ghost{background:transparent;color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.25)}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+
+/* ── FOOTER ── */
+footer{background:var(--bg-alt2);border-top:1px solid var(--border);padding:40px 0}
+.footer-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.footer-brand h3{font-weight:800;color:var(--navy);font-size:1rem;margin-bottom:6px}
+.footer-brand p{font-size:.82rem;color:var(--slate-light);max-width:260px;line-height:1.5}
+.footer-links h4{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-light);margin-bottom:12px}
+.footer-links ul{list-style:none}
+.footer-links li{margin-bottom:8px}
+.footer-links a{font-size:.85rem;color:var(--slate);transition:color .15s}
+.footer-links a:hover{color:var(--navy)}
+.footer-bottom{border-top:1px solid var(--border);margin-top:32px;padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--slate-light);flex-wrap:wrap;gap:10px}
+
+/* ── INLINE BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600;vertical-align:middle}
+.badge-new{background:#DCFCE7;color:#166534}
+.badge-core{background:#EFF6FF;color:#1D4ED8}
+.divider{height:1px;background:var(--border);margin:0}
+.ears-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.ears-table th{background:var(--bg-alt2);padding:10px 14px;font-size:.78rem;font-weight:600;color:var(--slate);text-align:left;border-bottom:2px solid var(--border)}
+.ears-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.ears-table td:first-child{font-weight:600;color:var(--navy);white-space:nowrap}
+.ears-table td:nth-child(2){font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#7C3AED;background:#FAF5FF}
+.ears-table td:nth-child(3){color:var(--slate);font-size:.82rem}
+</style>
+</head>
+<body>
+<!-- NAV -->
+<nav>
+<div class="container nav-inner">
+  <a href="#" class="nav-logo">🏛️ <span>Arch</span>pilot</a>
+  <div class="nav-links">
+    <a href="#how-it-works">How It Works</a>
+    <a href="#rules">Rule Library</a>
+    <a href="#spec-kit">Spec-Kit</a>
+    <a href="#platforms">Platforms</a>
+    <a href="#quickstart">Quick Start</a>
+  </div>
+  <div class="nav-cta">
+    <a href="https://github.com/gauravs19/archpilot" target="_blank" class="btn btn-outline">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/archive/refs/heads/main.zip" class="btn btn-primary">Download Library</a>
+  </div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<div class="container">
+  <div class="hero-badge"><span class="dot"></span> Phase 6 — Spec-Driven Development Now Available</div>
+  <h1 class="hero-title">Turn Any LLM into a<br><em>Senior Enterprise Architect</em></h1>
+  <p class="hero-subtitle">Archpilot is an open-source standards library — 35 rule files, 16 templates, and 5 platform configurations that eliminate AI architectural hallucinations and enforce production-grade design discipline.</p>
+  <div class="hero-actions">
+    <a href="#quickstart" class="btn btn-primary btn-lg">Get Started in 2 Minutes</a>
+    <a href="#rules" class="btn btn-outline btn-lg">Browse 35 Rules →</a>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-stat"><strong>35</strong><span>Rule Files</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><strong>16</strong><span>Templates</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><strong>5</strong><span>LLM Platforms</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><strong>~750KB</strong><span>of Standards</span></div>
+    <div class="hero-divider"></div>
+    <div>
+      <div class="hero-trusted">Works with</div>
+      <div class="hero-platforms">
+        <span class="platform-pill">Claude</span>
+        <span class="platform-pill">AWS Kiro</span>
+        <span class="platform-pill">Cursor</span>
+        <span class="platform-pill">Copilot</span>
+        <span class="platform-pill">ChatGPT</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- COMPARE BAR -->
+<div class="compare-bar">
+<div class="container">
+  <div class="compare-grid">
+    <div class="compare-col bad">
+      <h3>Without Archpilot</h3>
+      <div class="compare-item"><span class="compare-icon">✗</span><span>Generic, non-compliant architecture designs</span></div>
+      <div class="compare-item"><span class="compare-icon">✗</span><span>Security treated as an afterthought</span></div>
+      <div class="compare-item"><span class="compare-icon">✗</span><span>Missing NFRs, TCO, and data residency</span></div>
+      <div class="compare-item"><span class="compare-icon">✗</span><span>Inconsistent HLD vs LLD vs SDD formats</span></div>
+      <div class="compare-item"><span class="compare-icon">✗</span><span>Ambiguous requirements driving implementation drift</span></div>
+      <div class="compare-item"><span class="compare-icon">✗</span><span>Junior-level suggestions from a senior-priced tool</span></div>
+    </div>
+    <div class="compare-divider"><div class="compare-vs">VS</div></div>
+    <div class="compare-col good">
+      <h3>With Archpilot</h3>
+      <div class="compare-item"><span class="compare-icon">✓</span><span>Precision enterprise-grade LLDs and HLDs</span></div>
+      <div class="compare-item"><span class="compare-icon">✓</span><span>Zero-trust security by design, every time</span></div>
+      <div class="compare-item"><span class="compare-icon">✓</span><span>Comprehensive NFR audit and 3-year TCO modeling</span></div>
+      <div class="compare-item"><span class="compare-icon">✓</span><span>Standardized templates, ADRs, and decision records</span></div>
+      <div class="compare-item"><span class="compare-icon">✓</span><span>EARS-compliant specs driving traceable implementation</span></div>
+      <div class="compare-item"><span class="compare-icon">✓</span><span>Expert Senior Architect guidance on every output</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+<div class="container">
+  <div class="section-label">Methodology</div>
+  <h2 class="section-title">The Spec-Driven Development Loop</h2>
+  <p class="section-sub" style="margin-bottom:48px">Archpilot encodes the <strong>Specify → Plan → Task → Implement</strong> workflow — the same discipline used in AWS Kiro and GitHub Spec Kit — as a set of rules, templates, and AI instructions that any team can adopt in minutes.</p>
+  <div class="step-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Specify</div>
+      <p class="step-desc">Capture business intent in machine-readable EARS notation. Unambiguous, testable, traceable.</p>
+      <div class="step-artifact">requirements.md</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Plan</div>
+      <p class="step-desc">Translate specs into component design, data models, API contracts, and ADRs.</p>
+      <div class="step-artifact">design.md</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Task</div>
+      <p class="step-desc">Decompose design into atomic, independently verifiable units. Each task ≤ 4 hours.</p>
+      <div class="step-artifact">tasks.md</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Implement</div>
+      <p class="step-desc">AI agents execute one task at a time, constrained by the spec and project constitution.</p>
+      <div class="step-artifact">constitution.md</div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+<!-- RULE LIBRARY -->
+<section class="section section--alt" id="rules">
+<div class="container">
+  <div class="section-label">Rule Library</div>
+  <h2 class="section-title">35 Enterprise Architecture Rule Files</h2>
+  <p class="section-sub" style="margin-bottom:32px">Every rule file is a structured, LLM-ready document. Feed it directly to Claude, Kiro, Cursor, or Copilot to enforce that standard across your entire project.</p>
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('core')">Core Design</button>
+    <button class="tab" onclick="showTab('data')">Data &amp; Integration</button>
+    <button class="tab" onclick="showTab('ops')">Ops &amp; Security</button>
+    <button class="tab" onclick="showTab('delivery')">Delivery &amp; Governance</button>
+    <button class="tab" onclick="showTab('agentic')">⭐ Agentic Era</button>
+  </div>
+
+  <div class="tab-content active" id="tab-core">
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num">00</div><div class="rule-name">Architecture Principles</div><div class="rule-desc">SOLID, SoC, API-First, Fail Fast, Least Privilege, FinOps, and the reversibility decision framework.</div></div>
+      <div class="rule-card"><div class="rule-num">01</div><div class="rule-name">Solution Design</div><div class="rule-desc">When to write an SDD vs HLD vs LLD. Mandatory sections, quality checklist, anti-patterns.</div></div>
+      <div class="rule-card"><div class="rule-num">02</div><div class="rule-name">ADR Standards</div><div class="rule-desc">Architecture Decision Record lifecycle, trade-off matrices, quality gates, and anti-patterns.</div></div>
+      <div class="rule-card"><div class="rule-num">03</div><div class="rule-name">HLD Standards</div><div class="rule-desc">High-Level Design rules covering C4 context/container diagrams, integration architecture, and cost estimates.</div></div>
+      <div class="rule-card"><div class="rule-num">04</div><div class="rule-name">LLD Standards</div><div class="rule-desc">11 mandatory sections: class design, sequence diagrams, API specs, DB schemas, error handling, rollout.</div></div>
+      <div class="rule-card"><div class="rule-num">05</div><div class="rule-name">API Design</div><div class="rule-desc">REST conventions, HTTP status codes, error format standard, pagination, versioning, and rate limiting.</div></div>
+      <div class="rule-card"><div class="rule-num">09</div><div class="rule-name">Microservices Patterns</div><div class="rule-desc">Decomposition, synchronous vs async, saga patterns, circuit breakers, and service mesh standards.</div></div>
+      <div class="rule-card"><div class="rule-num">25</div><div class="rule-name">Domain-Driven Design</div><div class="rule-desc">Bounded contexts, aggregates, domain events, context mapping, and event storming facilitation.</div></div>
+      <div class="rule-card"><div class="rule-num">08</div><div class="rule-name">Cloud Architecture</div><div class="rule-desc">12-Factor App, compute selection matrix, IaC standards, VPC networking, HA/DR tiers.</div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-data">
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num">06</div><div class="rule-name">Data Architecture</div><div class="rule-desc">Data modeling, storage selection matrix, governance, PII handling, migrations, and indexing.</div></div>
+      <div class="rule-card"><div class="rule-num">10</div><div class="rule-name">Integration Patterns</div><div class="rule-desc">Event-driven, CDC, ETL/ELT, webhooks, API gateway, BFF, and choreography vs orchestration.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">32</div><div class="rule-name">Data Contracts</div><div class="rule-desc">Producer/consumer contracts with YAML schema, compatibility matrix, drift detection, and consumer registration.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">31</div><div class="rule-name">API Governance</div><div class="rule-desc">Full API lifecycle management, versioning policy, deprecation notice periods, DX checklist, OpenAPI linting gates.</div></div>
+      <div class="rule-card"><div class="rule-num">22</div><div class="rule-name">Multi-Tenancy</div><div class="rule-desc">Silo/bridge/pool models, tenant isolation, data partitioning, noisy neighbor prevention, SaaS patterns.</div></div>
+      <div class="rule-card"><div class="rule-num">14</div><div class="rule-name">Cost Optimization</div><div class="rule-desc">FinOps principles, TCO modeling, right-sizing, pricing model selection, tagging, and governance.</div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-ops">
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num">07</div><div class="rule-name">Security Architecture</div><div class="rule-desc">Zero trust, OAuth2/JWT, RBAC/ABAC, encryption standards, STRIDE threat modeling, OWASP, compliance.</div></div>
+      <div class="rule-card"><div class="rule-num">12</div><div class="rule-name">Observability Standards</div><div class="rule-desc">Structured logging, RED/USE metrics, distributed tracing, alerting thresholds, and dashboard design.</div></div>
+      <div class="rule-card"><div class="rule-num">19</div><div class="rule-name">Incident Management</div><div class="rule-desc">Severity levels, response process, on-call standards, post-mortem discipline, and runbook requirements.</div></div>
+      <div class="rule-card"><div class="rule-num">11</div><div class="rule-name">NFR Checklist</div><div class="rule-desc">69-point audit across performance, security, reliability, scalability, observability, and disaster recovery.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">33</div><div class="rule-name">Resilience &amp; Chaos Engineering</div><div class="rule-desc">GameDay playbook, 5 blast-radius levels, steady-state hypothesis, 18 fault injection types, chaos maturity model.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">34</div><div class="rule-name">Sustainability &amp; Green Architecture</div><div class="rule-desc">SCI formula, carbon-aware scheduling, GreenOps tagging, demand shaping, ARM efficiency targets, carbon budgets.</div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-delivery">
+    <div class="rule-grid">
+      <div class="rule-card"><div class="rule-num">13</div><div class="rule-name">DevOps &amp; CI/CD</div><div class="rule-desc">Pipeline stages, branching strategy, deployment patterns, Docker standards, GitOps, environment management.</div></div>
+      <div class="rule-card"><div class="rule-num">16</div><div class="rule-name">Estimation Framework</div><div class="rule-desc">T-shirt sizing, story points, FPA, bottom-up WBS, PERT analysis, and complexity multipliers.</div></div>
+      <div class="rule-card"><div class="rule-num">17</div><div class="rule-name">Migration &amp; Modernization</div><div class="rule-desc">Legacy assessment, Strangler Fig pattern, dual-write strategy, data migration, coexistence models.</div></div>
+      <div class="rule-card"><div class="rule-num">18</div><div class="rule-name">Architecture Governance</div><div class="rule-desc">ARB process, tech radar management, standards enforcement, exception handling, and compliance audit.</div></div>
+      <div class="rule-card"><div class="rule-num">20</div><div class="rule-name">Testing Strategy</div><div class="rule-desc">Test pyramid, contract testing, performance gates, chaos engineering integration, and quality metrics.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">30</div><div class="rule-name">Platform Engineering</div><div class="rule-desc">IDP capabilities, golden path standards, service catalog entry format, developer portal must-haves, platform SLOs.</div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-agentic">
+    <p style="margin-bottom:20px;padding:12px 16px;background:#EFF6FF;border-radius:var(--radius);border-left:3px solid var(--blue-light);font-size:.88rem;color:var(--navy)">
+      <strong>Phase 6 — Agentic Era:</strong> Eight new rule files added in 2026 covering Spec-Driven Development (SDD), context engineering for LLMs, agentic AI governance, and sustainability architecture.
+    </p>
+    <div class="rule-grid">
+      <div class="rule-card new-badge"><div class="rule-num">27</div><div class="rule-name">Spec-Driven Development</div><div class="rule-desc">EARS notation standard, Spec-Kit triad (requirements/design/tasks), full SDD loop, RTM, and AI agent prompt patterns.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">28</div><div class="rule-name">Context Engineering</div><div class="rule-desc">5-layer context stack, RAG chunk standards (200–500 tokens), token budgeting, PII-in-context rules, multi-agent contracts.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">29</div><div class="rule-name">Agentic AI Governance</div><div class="rule-desc">5-level autonomy model (L0–L4), HITL gates, blast radius controls, mandatory audit log schema, agent trust hierarchy.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">30</div><div class="rule-name">Platform Engineering</div><div class="rule-desc">Internal Developer Platform (IDP) capabilities, golden paths, service catalog format, developer portal requirements, SLOs.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">31</div><div class="rule-name">API Governance</div><div class="rule-desc">Full API lifecycle, versioning change type matrix, 12-month deprecation policy, DX checklist, Spectral lint gates.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">32</div><div class="rule-name">Data Contracts</div><div class="rule-desc">YAML contract structure, field-level PII flags, compatibility matrix, consumer registration, drift detection standards.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">33</div><div class="rule-name">Resilience &amp; Chaos Engineering</div><div class="rule-desc">Steady-state hypothesis, 5 blast-radius approval levels, GameDay playbook, 18 fault injection types, chaos maturity model.</div></div>
+      <div class="rule-card new-badge"><div class="rule-num">34</div><div class="rule-name">Sustainability &amp; Green Architecture</div><div class="rule-desc">SCI formula (E×I+M/R), carbon-aware scheduling, GreenOps carbon budgets, ARM migration targets, green CI/CD.</div></div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- SPEC KIT -->
+<section class="section" id="spec-kit">
+<div class="container">
+  <div class="speckit-grid">
+    <div>
+      <div class="section-label">Spec-Kit — New in Phase 6</div>
+      <h2 class="section-title">From "Vibe Coding" to Verifiable Engineering</h2>
+      <p style="color:var(--slate);margin-bottom:28px;line-height:1.7">Spec-Driven Development treats the specification as the primary source of truth. Code becomes a derivative artifact — regenerable, verifiable, and always aligned with the approved design.</p>
+      <div class="spec-feature">
+        <div class="spec-icon">📋</div>
+        <div class="spec-feature-text">
+          <h4>EARS Notation</h4>
+          <p>Easy Approach to Requirements Syntax transforms vague prose into machine-parseable, test-mappable behavioral statements — five precise patterns, zero ambiguity.</p>
+        </div>
+      </div>
+      <div class="spec-feature">
+        <div class="spec-icon">🔗</div>
+        <div class="spec-feature-text">
+          <h4>Requirement Traceability Matrix</h4>
+          <p>Every EARS requirement maps to a design component, an implementation task, and a test. No requirement ships untested. No code ships unspecified.</p>
+        </div>
+      </div>
+      <div class="spec-feature">
+        <div class="spec-icon">🤖</div>
+        <div class="spec-feature-text">
+          <h4>Agent-Ready Context Loading</h4>
+          <p>The Spec-Kit triad is structured for minimal, precise context injection — constitution first, single task second, relevant design sections third. No full-codebase hallucination.</p>
+        </div>
+      </div>
+      <a href="https://github.com/gauravs19/archpilot/blob/main/rules/27-spec-driven-development.md" target="_blank" class="btn btn-outline" style="margin-top:8px">Read rule 27 — SDD Standards →</a>
+    </div>
+    <div class="speckit-visual">
+      <div class="spec-file">
+        <div class="spec-file-header">
+          <div class="spec-file-dots"><span style="background:#EC4899"></span><span style="background:#F59E0B"></span><span style="background:#10B981"></span></div>
+          <span class="spec-file-name">requirements.md</span>
+        </div>
+        <div class="spec-file-body">
+<span class="cmt">## Functional Requirements (EARS)</span><br><br>
+| ID | Pattern | Requirement |<br>
+|---|---|---|<br>
+| <span class="str">FR-001</span> | Event | <span class="kw">When</span> valid credentials submitted,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the Auth Service <span class="kw">shall</span> issue JWT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(15-min expiry) within 200ms |<br>
+| <span class="str">FR-002</span> | Unwanted | <span class="kw">If</span> gateway returns 5xx, <span class="kw">then</span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;retry 3x with exponential backoff |
+        </div>
+      </div>
+      <div class="spec-file">
+        <div class="spec-file-header">
+          <div class="spec-file-dots"><span style="background:#EC4899"></span><span style="background:#F59E0B"></span><span style="background:#10B981"></span></div>
+          <span class="spec-file-name">constitution.md</span>
+        </div>
+        <div class="spec-file-body">
+<span class="cmt">## Security Non-Negotiables</span><br><br>
+<span class="kw">- [ ]</span> No hardcoded secrets — use Secrets Manager<br>
+<span class="kw">- [ ]</span> JWT validation on every protected endpoint<br>
+<span class="kw">- [ ]</span> Parameterized queries only — no SQL concat<br>
+<span class="kw">- [ ]</span> No PII in logs — automated scanner in CI<br><br>
+<span class="cmt">## AI Agent Boundaries</span><br><br>
+Agents <span class="str">MUST NOT</span> modify migration files without<br>DBA review or commit to main branch directly.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EARS Table -->
+  <div style="margin-top:56px">
+    <h3 style="font-size:1.15rem;font-weight:700;color:var(--navy);margin-bottom:6px">EARS Pattern Reference</h3>
+    <p style="font-size:.85rem;color:var(--slate);margin-bottom:20px">Five sentence patterns that make every requirement unambiguous, testable, and directly mappable to implementation tasks.</p>
+    <table class="ears-table">
+      <thead><tr><th>Pattern</th><th>Template</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>Ubiquitous</td><td>The [system] shall [action].</td><td>The Payment Service shall use TLS 1.3 for all inter-service communication.</td></tr>
+        <tr><td>Event-Driven</td><td>When [trigger], the [system] shall [action].</td><td>When a user submits valid credentials, the Auth Service shall issue a signed JWT within 200ms.</td></tr>
+        <tr><td>State-Driven</td><td>While [state], the [system] shall [action].</td><td>While the mobile app is offline, the system shall queue operations and sync on reconnection.</td></tr>
+        <tr><td>Unwanted</td><td>If [condition], then the [system] shall [action].</td><td>If the Payment Gateway returns 5xx, then the service shall retry 3 times with exponential backoff.</td></tr>
+        <tr><td>Optional</td><td>Where [feature enabled], the [system] shall [action].</td><td>Where multi-tenancy is enabled, the API shall enforce tenant-scoped data access on every request.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+<!-- STATS -->
+<div class="stats-bar">
+<div class="container">
+  <div class="stats-grid">
+    <div class="stat-item"><div class="stat-val">35</div><div class="stat-label">Architecture Rule Files</div></div>
+    <div class="stat-item"><div class="stat-val">16</div><div class="stat-label">Document Templates</div></div>
+    <div class="stat-item"><div class="stat-val">5</div><div class="stat-label">LLM Platforms Supported</div></div>
+    <div class="stat-item"><div class="stat-val">100+</div><div class="stat-label">NFR Checklist Points</div></div>
+    <div class="stat-item"><div class="stat-val">18+</div><div class="stat-label">Years of Architecture Practice</div></div>
+  </div>
+</div>
+</div>
+
+<!-- PLATFORMS -->
+<section class="section section--alt" id="platforms">
+<div class="container">
+  <div class="section-label">Platform Integrations</div>
+  <h2 class="section-title">Works with Your AI Stack</h2>
+  <p class="section-sub" style="margin-bottom:36px">Archpilot is model-agnostic and tool-agnostic. Each platform gets a dedicated configuration file pre-tuned to its instruction format and context model.</p>
+  <div class="platform-cards">
+    <div class="platform-card">
+      <div class="platform-card-icon">🤖</div>
+      <div class="platform-card-name">Claude Projects</div>
+      <div class="platform-card-desc">Upload rule files as project knowledge. Paste the instructions file. Instant enterprise architect persona.</div>
+      <div class="platform-card-tag">claude-project-instructions.md</div>
+    </div>
+    <div class="platform-card">
+      <div class="platform-card-icon">⚡</div>
+      <div class="platform-card-name">AWS Kiro</div>
+      <div class="platform-card-desc">Native SDD support via steering files. Drop the Kiro config into .kiro/steering/ and enforce EARS notation automatically.</div>
+      <div class="platform-card-tag">kiro-steering-instructions.md</div>
+    </div>
+    <div class="platform-card">
+      <div class="platform-card-icon">💻</div>
+      <div class="platform-card-name">Cursor IDE</div>
+      <div class="platform-card-desc">One-file setup. Copy cursor-rules.md to your project as .cursorrules and Cursor follows your architecture standards automatically.</div>
+      <div class="platform-card-tag">cursor-rules.md</div>
+    </div>
+    <div class="platform-card">
+      <div class="platform-card-icon">🐙</div>
+      <div class="platform-card-name">GitHub Copilot</div>
+      <div class="platform-card-desc">Place the Copilot instructions in .github/copilot-instructions.md. Works across VS Code, JetBrains, and GitHub.com.</div>
+      <div class="platform-card-tag">vscode-copilot-instructions.md</div>
+    </div>
+    <div class="platform-card">
+      <div class="platform-card-icon">🧠</div>
+      <div class="platform-card-name">ChatGPT / Gemini</div>
+      <div class="platform-card-desc">Use as Custom GPT system instructions or paste rule content as conversation context prefix. Works with any LLM.</div>
+      <div class="platform-card-tag">chatgpt-custom-gpt.md</div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- USE CASES -->
+<section class="section" id="usecases">
+<div class="container">
+  <div class="section-label">Use Cases</div>
+  <h2 class="section-title">What Architects Use It For</h2>
+  <p class="section-sub" style="margin-bottom:36px">Archpilot handles every stage of the architecture lifecycle — from greenfield design to legacy migration, from NFR audit to GameDay preparation.</p>
+  <div class="usecase-grid">
+    <div class="usecase-card">
+      <div class="usecase-icon">📐</div>
+      <div class="usecase-title">Low-Level Design (LLD)</div>
+      <div class="usecase-desc">Generate a production-grade LLD covering sequence diagrams, API specs, DB schemas, error handling, security, and observability — all in one structured document.</div>
+      <div class="usecase-rules"><span class="rule-tag">Rule 04</span><span class="rule-tag">Rule 05</span><span class="rule-tag">Rule 12</span><span class="rule-tag">LLD Template</span></div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">🏗️</div>
+      <div class="usecase-title">High-Level Design (HLD)</div>
+      <div class="usecase-desc">Produce C4 context and container diagrams, integration architecture, multi-region availability design, and NFR summary — structured for Architecture Review Board.</div>
+      <div class="usecase-rules"><span class="rule-tag">Rule 03</span><span class="rule-tag">Rule 08</span><span class="rule-tag">Rule 11</span><span class="rule-tag">HLD Template</span></div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">📋</div>
+      <div class="usecase-title">Spec-Driven Requirements</div>
+      <div class="usecase-desc">Convert user stories into EARS-compliant requirements, generate the design.md and tasks.md from them, and build a complete RTM before a single line of code is written.</div>
+      <div class="usecase-rules"><span class="rule-tag">Rule 27</span><span class="rule-tag">Spec Template</span><span class="rule-tag">Task Template</span><span class="rule-tag">Constitution</span></div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">🔐</div>
+      <div class="usecase-title">Security Architecture Review</div>
+      <div class="usecase-desc">Run a STRIDE threat model, OWASP Top 10 audit, and zero-trust compliance check against your design — generating a structured security findings report.</div>
+      <div class="usecase-rules"><span class="rule-tag">Rule 07</span><span class="rule-tag">Rule 11</span><span class="rule-tag">Security Persona</span></div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">🔀</div>
+      <div class="usecase-title">Legacy Migration Planning</div>
+      <div class="usecase-desc">Apply the Strangler Fig pattern, design dual-write strategies, and generate a phased migration plan with rollback gates — from monolith to microservices.</div>
+      <div class="usecase-rules"><span class="rule-tag">Rule 17</span><span class="rule-tag">Rule 09</span><span class="rule-tag">Migration Example</span></div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">💸</div>
+      <div class="usecase-title">TCO and Estimation</div>
+      <div class="usecase-desc">Generate bottom-up effort estimates using PERT analysis and complexity multipliers. Produce 3-year TCO models and FinOps-aligned cost architectures.</div>
+      <div class="usecase-rules"><span class="rule-tag">Rule 14</span><span class="rule-tag">Rule 16</span><span class="rule-tag">Estimation Example</span></div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+<!-- QUICK START -->
+<section class="section section--alt" id="quickstart">
+<div class="container">
+  <div class="section-label">Quick Start</div>
+  <h2 class="section-title">Up and Running in 2 Minutes</h2>
+  <p class="section-sub" style="margin-bottom:32px">Choose your platform. No installation. No CLI. No build step. Copy, paste, and your LLM immediately operates at enterprise-architect level.</p>
+  <div class="grid-2" style="gap:40px;align-items:start">
+    <div>
+      <div class="code-panel">
+        <div class="code-panel-tabs">
+          <button class="code-panel-tab active" onclick="showCode('claude')">Claude Projects</button>
+          <button class="code-panel-tab" onclick="showCode('kiro')">AWS Kiro</button>
+          <button class="code-panel-tab" onclick="showCode('cursor')">Cursor</button>
+          <button class="code-panel-tab" onclick="showCode('ears')">EARS Prompt</button>
+        </div>
+        <div class="code-panel-body">
+          <div class="cpanel-content active" id="code-claude">
+<span class="hl-cmt"># Option A: Claude Projects (Recommended)</span><br><br>
+<span class="hl-num">1.</span> Create a new <span class="hl-key">Claude Project</span><br>
+<span class="hl-num">2.</span> Paste <span class="hl-str">llm-configs/claude-project-instructions.md</span><br>&nbsp;&nbsp;&nbsp;as custom instructions<br>
+<span class="hl-num">3.</span> Upload as project knowledge:<br>
+&nbsp;&nbsp;&nbsp;<span class="hl-str">rules/00-architecture-principles.md</span><br>
+&nbsp;&nbsp;&nbsp;<span class="hl-str">rules/04-lld-standards.md</span><br>
+&nbsp;&nbsp;&nbsp;<span class="hl-str">rules/27-spec-driven-development.md</span><br>
+&nbsp;&nbsp;&nbsp;<span class="hl-str">templates/spec-template.md</span><br>
+<span class="hl-num">4.</span> Ask: <span class="hl-req">"Create a spec for a payment service</span><br>
+&nbsp;&nbsp;&nbsp;<span class="hl-req">using EARS notation."</span><br>
+<span class="hl-num">5.</span> Get production-grade output ✓
+          </div>
+          <div class="cpanel-content" id="code-kiro">
+<span class="hl-cmt"># Option B: AWS Kiro (Native SDD)</span><br><br>
+<span class="hl-cmt"># Place file in your project:</span><br>
+<span class="hl-str">.kiro/steering/archpilot-standards.md</span><br><br>
+<span class="hl-cmt"># Copy from:</span><br>
+<span class="hl-str">llm-configs/kiro-steering-instructions.md</span><br><br>
+<span class="hl-cmt"># Kiro will automatically enforce:</span><br>
+<span class="hl-key">✓</span> EARS notation on requirements<br>
+<span class="hl-key">✓</span> Specify → Plan → Task → Implement loop<br>
+<span class="hl-key">✓</span> Constitution constraints on every task<br>
+<span class="hl-key">✓</span> Security non-negotiables in every file<br>
+<span class="hl-key">✓</span> API-First workflow before implementation
+          </div>
+          <div class="cpanel-content" id="code-cursor">
+<span class="hl-cmt"># Option C: Cursor IDE</span><br><br>
+<span class="hl-cmt"># Copy to your project root:</span><br>
+cp llm-configs/cursor-rules.md <span class="hl-str">.cursorrules</span><br><br>
+<span class="hl-cmt"># For spec-driven projects, also add:</span><br>
+mkdir -p <span class="hl-str">.specs</span><br>
+cp templates/spec-template.md <span class="hl-str">.specs/requirements.md</span><br>
+cp templates/design-spec-template.md <span class="hl-str">.specs/design.md</span><br>
+cp templates/task-list-template.md <span class="hl-str">.specs/tasks.md</span><br>
+cp templates/constitution-template.md <span class="hl-str">constitution.md</span><br><br>
+<span class="hl-cmt"># Open a composer session and say:</span><br>
+<span class="hl-req">"Implement Task T-03 from .specs/tasks.md.</span><br>
+<span class="hl-req">Follow constitution.md. Reference</span><br>
+<span class="hl-req">.specs/design.md §3 for data models."</span>
+          </div>
+          <div class="cpanel-content" id="code-ears">
+<span class="hl-cmt"># LLM-Agnostic: Prefix-Any-Prompt Pattern</span><br><br>
+<span class="hl-cmt"># For any LLM (Gemini, Groq, Claude, GPT-4):</span><br><br>
+<span class="hl-str">"Follow these architecture standards:</span><br>
+<span class="hl-str">[paste rules/27-spec-driven-development.md]</span><br><br>
+<span class="hl-str">Now convert these user stories to EARS notation</span><br>
+<span class="hl-str">and produce requirements.md for a real-time</span><br>
+<span class="hl-str">fraud detection service. Include:</span><br>
+<span class="hl-str">- Functional requirements (FR-001..)</span><br>
+<span class="hl-str">- NFRs with numeric targets</span><br>
+<span class="hl-str">- Acceptance criteria for each FR</span><br>
+<span class="hl-str">- RTM stub</span><br>
+<span class="hl-str">- Out of scope section"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:20px">16 Ready-to-Use Templates</h3>
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">📋</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">spec-template.md <span class="badge badge-new">NEW</span></div>
+            <div style="font-size:.77rem;color:var(--slate)">EARS requirements with RTM — the "what"</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">🏗️</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">design-spec-template.md <span class="badge badge-new">NEW</span></div>
+            <div style="font-size:.77rem;color:var(--slate)">Component, data model, API, STRIDE — the "how"</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">✅</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">task-list-template.md <span class="badge badge-new">NEW</span></div>
+            <div style="font-size:.77rem;color:var(--slate)">Atomic agent tasks with acceptance criteria</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">⚖️</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">constitution-template.md <span class="badge badge-new">NEW</span></div>
+            <div style="font-size:.77rem;color:var(--slate)">Project law — tech stack, security, agent boundaries</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">📄</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">lld-template.md + hld-template.md</div>
+            <div style="font-size:.77rem;color:var(--slate)">13-section LLD and 14-section HLD blueprints</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">📊</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">data-contract-template.md <span class="badge badge-new">NEW</span></div>
+            <div style="font-size:.77rem;color:var(--slate)">YAML contract with PII flags and consumer registration</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:#fff">
+          <span style="font-size:1rem">🔖</span>
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--navy)">go-live-checklist.md</div>
+            <div style="font-size:.77rem;color:var(--slate)">80-point pre-launch verification across 8 domains</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+<!-- AUTHOR -->
+<section class="section" id="about">
+<div class="container">
+  <div class="author-section">
+    <div class="author-avatar">👨‍💻</div>
+    <div>
+      <p class="author-quote">"Most architects carry their standards in their heads. Archpilot codifies them — making enterprise architecture consistent, teachable, and AI-augmented. The quality of an architect's work is defined not by the buildings they design, but by the standards they maintain."</p>
+      <div class="author-name">Gaurav Sharma</div>
+      <div class="author-title">Enterprise Architect — 18+ Years of Architecture Delivery across Financial Services, Retail, and Platform Engineering</div>
+      <div class="author-links">
+        <a href="https://gauravs19.github.io/portfolio/" target="_blank" class="author-link">Portfolio →</a>
+        <a href="https://github.com/gauravs19" target="_blank" class="author-link">GitHub →</a>
+        <a href="https://github.com/gauravs19/archpilot" target="_blank" class="author-link">View All Standards →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta-section">
+<div class="container">
+  <h2 class="cta-title">Stop Letting AI Guess Your Standards</h2>
+  <p class="cta-sub">Every architecture review, LLD, and ADR your team produces should reflect 18 years of enterprise discipline — not an LLM's best guess. Give it the guardrails.</p>
+  <div class="cta-btns">
+    <a href="https://github.com/gauravs19/archpilot" target="_blank" class="btn btn-white btn-lg">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      Star on GitHub
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/archive/refs/heads/main.zip" class="btn btn-ghost btn-lg">Download Library</a>
+    <a href="https://github.com/gauravs19/archpilot-reviewer" target="_blank" class="btn btn-ghost btn-lg">Archpilot Reviewer →</a>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="container">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h3>🏛️ Archpilot</h3>
+      <p>Enterprise Architecture Standards Library — 35 rules, 16 templates, 5 platforms. MIT Licensed, community-driven.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Rule Library</h4>
+      <ul>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/rules/27-spec-driven-development.md" target="_blank">Spec-Driven Development</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/rules/04-lld-standards.md" target="_blank">LLD Standards</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/rules/07-security-architecture.md" target="_blank">Security Architecture</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/rules/11-nfr-checklist.md" target="_blank">NFR Checklist</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/tree/main/rules" target="_blank">All 35 Rules →</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Templates</h4>
+      <ul>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/templates/spec-template.md" target="_blank">Spec Template (EARS)</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/templates/constitution-template.md" target="_blank">Constitution Template</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/templates/lld-template.md" target="_blank">LLD Template</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/templates/go-live-checklist.md" target="_blank">Go-Live Checklist</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/tree/main/templates" target="_blank">All 16 Templates →</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Platform Configs</h4>
+      <ul>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/llm-configs/claude-project-instructions.md" target="_blank">Claude Projects</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/llm-configs/kiro-steering-instructions.md" target="_blank">AWS Kiro</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/llm-configs/cursor-rules.md" target="_blank">Cursor IDE</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot/blob/main/llm-configs/vscode-copilot-instructions.md" target="_blank">GitHub Copilot</a></li>
+        <li><a href="https://github.com/gauravs19/archpilot-reviewer" target="_blank">Archpilot Reviewer</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Gaurav Sharma. MIT License. Open source.</span>
+    <div style="display:flex;gap:16px">
+      <a href="https://github.com/gauravs19/archpilot" target="_blank" style="color:var(--slate-light)">GitHub</a>
+      <a href="https://gauravs19.github.io/portfolio/" target="_blank" style="color:var(--slate-light)">Portfolio</a>
+      <a href="https://github.com/gauravs19/archpilot/blob/main/LICENSE" target="_blank" style="color:var(--slate-light)">License</a>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+function showCode(name){
+  document.querySelectorAll('.code-panel-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.cpanel-content').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('code-'+name).classList.add('active');
+}
+// Smooth active nav highlight on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{
+  let current='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id});
+  navLinks.forEach(a=>{a.style.color=a.getAttribute('href')==='#'+current?'var(--navy)':''});
+},{ passive:true });
+</script>
+</body>
+</html>
