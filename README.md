@@ -121,7 +121,7 @@ graph TD
 
 ```
 archpilot/
-├── rules/                              # 🧠 Architecture Standards & Guidelines (35 files)
+├── rules/                              # 🧠 Architecture Standards & Guidelines (36 files)
 │   ├── 00-architecture-principles.md   # Universal design principles, decision framework
 │   ├── 01-solution-design.md           # SDD standards, when HLD vs LLD vs SDD
 │   ├── 02-adr-standards.md             # ADR writing standards & lifecycle
@@ -156,7 +156,8 @@ archpilot/
 │   ├── 31-api-governance.md            # ⭐ NEW: API lifecycle, productization, DX
 │   ├── 32-data-contracts.md            # ⭐ NEW: Producer/consumer contracts, schema drift
 │   ├── 33-resilience-chaos-engineering.md  # ⭐ NEW: GameDays, fault injection, blast radius
-│   └── 34-sustainability-green-architecture.md  # ⭐ NEW: Carbon-aware, GreenOps, SCI
+│   ├── 34-sustainability-green-architecture.md  # ⭐ NEW: Carbon-aware, GreenOps, SCI
+│   └── 35-multi-agent-contracts.md     # ⭐ NEW: Artifact-driven agent handoffs, trust hierarchy
 │
 ├── templates/                          # 📝 Document Templates (16 files)
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
@@ -174,7 +175,8 @@ archpilot/
 │   ├── design-spec-template.md         # ⭐ NEW: Spec-Kit design.md (architecture + schemas)
 │   ├── task-list-template.md           # ⭐ NEW: Spec-Kit tasks.md (atomic agent tasks)
 │   ├── constitution-template.md        # ⭐ NEW: Project constitution / AI agent law
-│   └── data-contract-template.md       # ⭐ NEW: Producer/consumer data contract
+│   ├── data-contract-template.md       # ⭐ NEW: Producer/consumer data contract
+│   └── multi-agent-handoff-template.md # ⭐ NEW: Handoff contract for orchestrator/sub-agents
 │
 ├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
 │   ├── claude-project-instructions.md  # Ready for Claude Projects
@@ -200,7 +202,7 @@ archpilot/
 └── README.md                           # This file
 ```
 
-**Total: 67 files | ~750 KB of enterprise architecture standards**
+**Total: 69 files | ~760 KB of enterprise architecture standards**
 
 ---
 
@@ -243,6 +245,7 @@ archpilot/
 | 32 | ⭐ **Data Contracts** | Producer/consumer contracts, YAML schema, compatibility matrix, drift detection | ~11 KB |
 | 33 | ⭐ **Resilience & Chaos Engineering** | GameDays, fault injection, blast radius levels, steady-state hypothesis, chaos loop | ~12 KB |
 | 34 | ⭐ **Sustainability & Green Architecture** | SCI score, carbon-aware scheduling, GreenOps, demand shaping, ARM efficiency | ~9 KB |
+| 35 | ⭐ **Multi-Agent Contracts** | Artifact-driven agent handoffs, trust hierarchy, bounding boxes, code review protocols | ~11 KB |
 
 ---
 
@@ -353,8 +356,10 @@ Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your
 - **Data Contracts (rule 32):** YAML contract schema, compatibility matrix, drift detection, consumer registration
 - **Resilience & Chaos Engineering (rule 33):** GameDay playbook, 5 blast-radius levels, 7-step chaos loop
 - **Sustainability & Green Architecture (rule 34):** SCI formula, carbon-aware patterns, GreenOps, ARM migration
+- **Multi-Agent Contracts (rule 35):** Artifact-driven handoffs, trust hierarchy, agent bounding boxes, automated review protocols
 - **Spec-Kit Templates:** spec-template.md (EARS), design-spec-template.md, task-list-template.md, constitution-template.md
 - **Data Contract Template:** Fully structured YAML + field definition table
+- **Multi-Agent Handoff Template:** Structured contract for orchestrator to sub-agent delegation
 - **AWS Kiro Steering File:** kiro-steering-instructions.md for native SDD enforcement in Kiro
 
 ---
