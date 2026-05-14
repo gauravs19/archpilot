@@ -117,7 +117,20 @@ For each item, mark:
 - [ ] Business stakeholder sign-off obtained
 - [ ] Go-live date communicated to all stakeholders
 
-## 10. Rollout Plan
+## 10. AI-Assisted Codebase (apply when code was generated with AI tools)
+
+- [ ] `npm audit --audit-level=high` returns zero high/critical CVEs
+- [ ] `npx depcheck` confirms all installed packages are actually used
+- [ ] All required environment variables validated at startup — app exits with clear error on missing config
+- [ ] SIGTERM handler implemented — in-flight requests drain before process exits
+- [ ] All DB migrations tested with rollback script — no `NOT NULL` additions without backfill
+- [ ] Every `UPDATE`/`DELETE` statement has a scoping WHERE clause — reviewed in code, not assumed
+- [ ] Multi-tenant queries confirmed to include `orgId`/`tenantId` scope on all data access
+- [ ] No `jwt.verify()` calls without explicit `algorithms` option
+- [ ] No TypeScript `!` non-null assertions on `process.env` lookups
+- [ ] Integration boundaries between major modules validated with schema checks (Zod, Joi, or equivalent)
+
+## 11. Rollout Plan
 
 - [ ] Rollout strategy defined (% of users, geography, time)
 - [ ] Rollback criteria defined (error rate > X%, latency > Y)
@@ -141,8 +154,9 @@ For each item, mark:
 | Operations | 7 | | | |
 | Documentation | 6 | | | |
 | Business | 7 | | | |
+| AI-Assisted Codebase | 10 | | | |
 | Rollout | 6 | | | |
-| **TOTAL** | **80** | | | |
+| **TOTAL** | **90** | | | |
 
 **Go/No-Go Decision:**
 - All ❌ items must be resolved OR have an approved exception
