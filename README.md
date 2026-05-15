@@ -90,6 +90,13 @@ graph TD
 
 **📖 Read the full [End-to-End User Guide](docs/user-guide.md) to see how to run the complete Archpilot workflow from Phase 0 Discovery to Phase 3 Execution.**
 
+### The Archpilot CLI (New!)
+Initialize a project and lint your specs automatically:
+```bash
+python archpilot.py init  # Scaffolds .specs/ directory
+python archpilot.py lint  # Scans .specs/ for rule violations
+```
+
 ### Option A: Claude Projects
 1. Create a new [Claude Project](https://claude.ai)
 2. Paste [`llm-configs/claude-project-instructions.md`](./llm-configs/claude-project-instructions.md) as custom instructions
@@ -160,8 +167,10 @@ archpilot/
 │   ├── 33-resilience-chaos-engineering.md  # GameDays, fault injection, blast radius
 │   ├── 34-sustainability-green-architecture.md  # Carbon-aware, GreenOps, SCI
 │   ├── 35-multi-agent-contracts.md     # Artifact-driven agent handoffs, trust hierarchy
-│   └── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
+│   ├── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
+│   └── 37-sdd-triage-matrix.md         # SDD Fast-Track / Bypassing matrix
 │
+├── archpilot.py                        # 🚀 The Archpilot CLI (init & lint)
 ├── tools/                              # 🛠️ Executable Tools
 │   ├── nfr_calculator.py               # Enterprise NFR physics (50+ metrics, Little's Law, IOPS)
 │   └── generate_diagrams.py            # Generator for standard Mermaid archetypes

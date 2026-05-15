@@ -98,6 +98,12 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print(f" [49] Compression:              Brotli/GZIP required on API Gateway")
     print(f" [50] VPC Subnet Sizing:        /24 per AZ minimum (254 IPs)")
 
+    # 6. STATISTICAL VARIANCE & BURST WARNINGS
+    print("\n⚠️  6. VARIANCE & NON-LINEAR SCALING WARNINGS")
+    print(" [!] Little's Law assumes uniform traffic distribution. It does not account for GC pauses or lock contention.")
+    print(" [!] Always provision a 20% 'Burst Buffer' above the calculated maximums for CPU/Memory.")
+    print(" [!] Database IOPS calculations assume linear write latency. Watch for index-bloat degradation.")
+
     print("\n" + "=" * 70)
 
 if __name__ == "__main__":
