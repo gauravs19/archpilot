@@ -160,6 +160,12 @@ archpilot/
 │   ├── 35-multi-agent-contracts.md     # Artifact-driven agent handoffs, trust hierarchy
 │   └── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
 │
+├── tools/                              # 🛠️ Executable Tools
+│   └── nfr_calculator.py               # Calculates TPS, bandwidth, and IOPS via Little's Law
+├── diagrams/                           # 📊 Mermaid Archetype Library
+│   ├── 01-c4-context-archetype.md      # C4 standard color palette & layout
+│   ├── 02-saga-choreography-archetype.md # Distributed transaction rollback sequences
+│   └── 03-active-active-failover.md    # Multi-region HA topologies
 ├── templates/                          # 📝 Document Templates (19 files)
 │   ├── discovery-template.md           # Ambiguity resolution & presales template
 │   ├── assumption-log-template.md      # RAID / Assumption tracking template
