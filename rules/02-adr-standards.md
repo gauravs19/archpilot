@@ -1,44 +1,25 @@
-# ADR Standards — Architecture Decision Records
+# Architecture Decision Records (ADR) — Enterprise Standard
 
-> **Purpose:** This rule file defines when, how, and in what format Architecture Decision
-> Records should be created. When used as LLM context, it ensures every generated ADR
-> follows enterprise best practices with proper trade-off analysis.
-
----
-
-## Related Standards
-
-| Standard | Relationship |
-|----------|-------------|
-| [00 — Architecture Principles](./00-architecture-principles.md) | Decision-Making Framework (§2) that ADRs implement |
-| [01 — Solution Design](./01-solution-design.md) | SDDs reference ADRs for key decisions |
-| [templates/adr-template.md](../templates/adr-template.md) | Ready-to-fill ADR template |
-
----
-
-## How to Use This File
-
-- Feed this to any LLM alongside `templates/adr-template.md`
-- Say: *"Using these ADR standards, create an ADR for: [your decision]"*
-- The LLM will produce a structured, complete ADR following these rules.
+> **Purpose:** This rule file defines the exact lifecycle, mathematical scoring mechanisms, and mandatory structure of Architecture Decision Records (ADRs). 
+> An enterprise without ADRs operates on oral tradition and hallway conversations, leading to catastrophic technical debt. This standard enforces immutable, verifiable decision governance.
 
 ---
 
 ## 1. What is an ADR?
 
-An Architecture Decision Record (ADR) is a **short document** that captures a single
-architecture decision, its context, the options considered, and the consequences.
+An Architecture Decision Record (ADR) is a short text file that captures an important architectural decision made along with its context and consequences.
 
 ADRs are:
-- **Immutable records** — once accepted, they are not edited (they are superseded by new ADRs)
-- **Version controlled** — stored in the repository alongside the code they govern
+- **Immutable records** — once accepted, they are not edited (they are superseded by new ADRs). Once merged to `main`, a server-side Git hook MUST reject any commit attempting to alter the `Context` or `Decision` text of an `[Accepted]` ADR.
+- **Version controlled** — stored in the repository alongside the code they govern (`docs/adr/`).
 - **Sequentially numbered** — ADR-001, ADR-002, etc.
+- **Graph Nodes** — ADRs form a Directed Acyclic Graph (DAG) of technical debt. When ADR-042 supersedes ADR-012, it must contain a pointer back to ADR-012. The CI pipeline MUST build and validate this graph using tools like `log4brains`.
 
 ---
 
 ## 2. When to Write an ADR
 
-### MUST Write an ADR
+### MUST Write an ADR (Non-Negotiable)
 - Choosing a database technology (PostgreSQL vs DynamoDB vs MongoDB)
 - Choosing a messaging system (Kafka vs RabbitMQ vs SQS)
 - Choosing an architectural pattern (monolith vs microservices vs modular monolith)
@@ -47,44 +28,53 @@ ADRs are:
 - Choosing a deployment strategy (K8s vs serverless vs VMs)
 - Introducing a new framework or library that affects multiple teams
 - Changing a data model that impacts multiple services
-- Any decision that is costly to reverse
+- Any decision that alters the 36-month TCO projection by more than 15%.
+- Any decision that is costly to reverse (1-Way Door).
 
 ### SHOULD Write an ADR
 - Choosing between two approaches within a single service (if non-trivial)
-- Adopting a specific design pattern for a domain problem
+- Adopting a specific design pattern for a domain problem (e.g., Saga vs Two-Phase Commit)
 - Selecting a third-party service or SaaS tool
 - Deciding on a caching strategy
 
 ### Do NOT Write an ADR
 - Variable naming conventions (code style guide is better)
-- Minor library version choices
+- Minor library version bumps (dependabot handles this)
 - Bug fixes or feature implementation details
-- Decisions that are trivially reversible
+- Decisions that are trivially reversible (2-Way Doors taking < 1 engineering week to undo)
 
 ---
 
-## 3. ADR Lifecycle
+## 3. ADR Lifecycle & ARB Protocol
 
-```
-Proposed → Accepted → [Active]
-                        │
-                  ┌─────┴─────┐
-                  ▼           ▼
-             Deprecated   Superseded
-                          (by ADR-XXX)
+```mermaid
+graph TD
+    Draft["Draft (Local)"] --> Proposed["Proposed (PR Open)"]
+    Proposed -->|Team Review| Revisions["Revisions Requested"]
+    Revisions --> Proposed
+    Proposed -->|ARB Review| Accepted["Accepted (Merged)"]
+    Proposed -->|Rejected| Rejected["Rejected (Closed)"]
+    Accepted -->|Time Passes| Deprecated["Deprecated (Retired)"]
+    Accepted -->|New Tech Needs| Superseded["Superseded (By ADR-XXX)"]
 ```
 
 | Status | Meaning |
 |--------|---------|
-| **Proposed** | Under review, not yet approved |
-| **Accepted** | Approved by architecture review, currently active |
-| **Deprecated** | No longer relevant (technology retired, feature removed) |
-| **Superseded** | Replaced by a newer ADR (must link to the new one) |
+| **Proposed** | Under review in a Pull Request. Code implementing this CANNOT be merged. |
+| **Accepted** | Approved by architecture review (ARB), currently active and binding. |
+| **Deprecated** | No longer relevant (technology retired, feature removed). |
+| **Superseded** | Replaced by a newer ADR. The old ADR MUST link to the new one. |
+
+### The ARB (Architecture Review Board) Protocol
+- ADRs categorized as "Cross-Cutting" must be reviewed in the weekly ARB meeting.
+- The author has 5 minutes to present the Context and Alternatives.
+- The ARB does not design the system; the ARB challenges the assumptions, specifically the scoring weights in the Evaluation Matrix.
+- **Deadlock Resolution:** If the ARB cannot reach consensus within 30 minutes, the tie-breaker defers strictly to the individual bearing the highest operational pager-duty risk for the system. Dissenting members record their dissent in the ADR, and the team commits to execution.
 
 **Rules:**
 - Never delete an ADR. Mark it as deprecated or superseded.
 - When an ADR is superseded, update the old ADR's status AND link to the new one.
-- The new ADR SHOULD reference the old ADR it supersedes.
+- CI/CD pipelines MUST contain automated checks to ensure no ADRs have been deleted.
 
 ---
 
@@ -95,7 +85,6 @@ Proposed → Accepted → [Active]
 - The title MUST be a statement, not a question.
 - Good: `ADR-003: Use PostgreSQL for User Profile Storage`
 - Bad: `ADR-003: Database Selection` (too vague)
-- Bad: `ADR-003: Should We Use PostgreSQL?` (question, not decision)
 
 ### 4.2 Status
 One of: `Proposed | Accepted | Deprecated | Superseded by ADR-XXX`
@@ -105,146 +94,187 @@ ISO 8601 format: `YYYY-MM-DD`
 
 ### 4.4 Context
 **What this section MUST include:**
-- The business or technical problem driving this decision
-- Current state — what exists today
-- Constraints — budget, timeline, team skills, compliance
-- Forces — what tensions exist (speed vs quality, cost vs capability, etc.)
+- The business or technical problem driving this decision.
+- Current state — what exists today.
+- Constraints — strict hard boundaries (e.g., Budget max $5k/month, data MUST reside in EU).
+- Forces — what tensions exist (speed vs quality, cost vs capability, etc.).
 
-**Rules:**
-- Write as objective facts, not opinions.
-- Include quantitative data where possible (traffic volume, team size, budget).
-- Reference the business requirement or user story that created this need.
-
-### 4.5 Decision
-**What we chose and WHY.**
+### 4.5 The Decision & Rationale
 - State the decision clearly in 1-2 sentences.
 - Then explain the reasoning — connect it back to the context and constraints.
 - Reference the evaluation criteria that led to this choice.
 
-### 4.6 Alternatives Considered
-MUST include at least 2 alternatives (including the chosen option).
+### 4.6 Alternatives Considered & The Evaluation Matrix (The Math)
+MUST include at least 2 alternatives (including the chosen option). Presenting a single option is an automatic failure.
 
-For each alternative, document:
+Create a weighted scoring matrix. Assign a weight (1-5) to each criterion, and score each option (1-5).
+*Formula: Score = Weight × Option Rating* OR use the *Weighted Product Model* $P(x) = \prod (C_i)^{w_i}$ for critical systems.
 
-| Criterion | Option A | Option B | Option C |
-|-----------|----------|----------|----------|
-| Criteria 1 (weighted) | Score | Score | Score |
-| Criteria 2 (weighted) | Score | Score | Score |
-| **Total** | | | |
-
-**Evaluation criteria SHOULD include:**
-- Technical fit (does it solve the problem?)
-- Team expertise (do we know this technology?)
-- Total cost of ownership (licensing, ops, training)
-- Scalability (does it handle our growth plan?)
-- Community & ecosystem (support, documentation, longevity)
-- Operational complexity (how hard to run in production?)
-- Lock-in risk (how hard to migrate away?)
+| Evaluation Criterion | Weight (1-5) | Option A | Option B | Option C |
+|----------------------|:------------:|:--------:|:--------:|:--------:|
+| Technical Fit | 5 | 5 (25) | 1 (5) | 2 (10) |
+| Operational Complexity | 3 | 3 (9) | 5 (15) | 3 (9) |
+| Latency at Scale | 4 | 3 (12) | 5 (20) | 4 (16) |
+| Team Expertise | 4 | 5 (20) | 2 (8) | 4 (16) |
+| 3-Year TCO Cost | 3 | 4 (12) | 2 (6) | 3 (9) |
+| **Total Score** | | **78** | **54** | **60** |
 
 **Rules:**
-- Never present a single option. If there's truly only one option, document why alternatives were rejected.
-- Be honest about the trade-offs of the chosen option. Every choice has downsides.
-- Include "Do Nothing" as an option when applicable.
+- Never present a single option.
+- Every tech has downsides. Be honest about them.
+- Any performance claims MUST link to a reproducible GitHub repository containing the load testing script (`k6` or `Gatling`).
 
 ### 4.7 Consequences
+You must define the physical, architectural, and human consequences of the decision.
+**Positive consequences** — what we gain.
+**Negative consequences (Technical Debt)** — what pain are we explicitly agreeing to accept? (e.g., "We accept the operational burden of managing replication, taking roughly 10 hours/month of DBA time").
+**Risks & Mitigations** — list risks with likelihood and impact.
 
-**Positive consequences** — what we gain:
-- List specific benefits from this decision.
-
-**Negative consequences** — what we accept:
-- List specific trade-offs or downsides.
-- These are NOT risks; they are known, accepted costs.
-
-**Risks** — what could go wrong:
-- List risks with likelihood and impact.
-- Include mitigation strategies for each risk.
-
-### 4.8 Compliance & Standards (Optional but Recommended)
-- Does this decision affect regulatory compliance (GDPR, SOC2, PCI-DSS)?
-- Does it align with organization architecture principles?
-- Does it follow industry standards?
+### 4.8 Compliance & Enterprise Standards
+Explicitly define how this decision aligns with the global standards:
+- Does it meet Rule 07 (Zero Trust)?
+- Does it meet SOC2/HIPAA bounds?
+- Does it align with Rule 14 (Cost Optimization)?
 
 ### 4.9 References
 - Links to RFCs, blog posts, benchmarks, vendor documentation, or related ADRs.
 
 ---
 
-## 5. File Naming & Storage
+## 5. File Naming, Storage, & CI Validation
 
 ### Naming Convention
 ```
 docs/adr/NNN-short-description.md
 ```
-
-Examples:
-```
-docs/adr/001-use-postgresql-for-user-profiles.md
-docs/adr/002-adopt-event-driven-architecture.md
-docs/adr/003-choose-github-actions-for-cicd.md
-```
-
 **Rules:**
 - Sequential numbering, zero-padded to 3 digits.
 - Lowercase, kebab-case.
-- Description matches the decision statement.
 
 ### Storage Location
-- ADRs MUST live in the repository they govern: `docs/adr/`
-- Organization-wide ADRs (cross-cutting) go in a dedicated architecture repository.
+- **Service-Level ADRs:** MUST live in the individual service's Git repository (`my-service/docs/adr/`).
+- **Enterprise-Level ADRs:** Cross-cutting decisions MUST live in a central, globally readable Architecture repository.
+- **Backstage Integration:** The enterprise Internal Developer Portal (IDP) must use the Backstage ADR plugin to index and display all ADRs globally.
+
+### Architectural Drift Detection
+- Use tools like `ArchUnit` or `NetArchTest` to ensure that if `ADR-042` mandates `PostgreSQL` and bans `MongoDB`, there are zero imports of `org.mongodb.*` in the codebase. If the code drifts from the ADR graph, the CI build MUST fail.
 
 ---
 
-## 6. Quality Checklist
+## 6. Massive Enterprise Example: A Flawless ADR
+
+To demonstrate exactly what the ARB expects, here is a complete, real-world example of an ADR that satisfies all rigorous requirements.
+
+### ADR-014: Adopt Confluent Cloud Kafka over AWS SQS for Order Processing
+**Status:** Accepted
+**Date:** 2026-11-04
+**Authors:** Gaurav Sharma (Principal Architect)
+
+#### Context
+The core Order Processing engine currently uses AWS SQS to buffer incoming transactions. As business volume has grown to 5k TPS, we are hitting severe limitations:
+1. SQS does not support message replay natively. If a downstream consumer deploys a bug, we cannot simply "rewind" the topic to reprocess the lost state.
+2. SQS limits us to a single consumer per queue unless we fan out via SNS, which adds complexity and cost.
+3. SQS ordering (FIFO) is strictly limited to 3k TPS. We need 10k TPS headroom.
+
+**Constraints:**
+- Must handle 10,000 TPS with p99 latency < 50ms.
+- Must allow message replay for up to 7 days.
+- Must not exceed $10,000/month in infrastructure costs.
+
+#### Evaluation Matrix
+
+| Evaluation Criterion | Weight (1-5) | Option A: Kafka (Self-Hosted) | Option B: Kafka (Confluent Cloud) | Option C: AWS Kinesis |
+|----------------------|:------------:|:-----------------------------:|:---------------------------------:|:---------------------:|
+| Replay Capability | 5 | 5 (25) | 5 (25) | 4 (20) |
+| Latency @ 10k TPS | 5 | 5 (25) | 5 (25) | 2 (10) |
+| Operational Complexity| 5 | 1 (5)  | 5 (25) | 4 (20) |
+| Team Expertise | 3 | 2 (6)  | 3 (9)  | 4 (12) |
+| 3-Year TCO | 4 | 2 (8)  | 4 (16) | 3 (12) |
+| **Total Score** | | **69** | **100**| **74** |
+
+#### Decision
+We will adopt **Confluent Cloud Kafka**. 
+
+While AWS Kinesis meets our replay needs and is fully managed, its strict shard limits and higher p99 latency at 10k TPS make it unsuitable for our latency requirements. Self-hosting Kafka scores highly technically but fails completely on Operational Complexity (Weight 5); we do not have the SRE headcount to manage Zookeeper/KRaft quorums, partition rebalancing, and OS patching. Confluent Cloud provides the performance of Kafka without the operational burden.
+
+#### Consequences
+**Positive:**
+- We achieve multi-consumer pub/sub semantics.
+- We gain 7-day infinite replayability for incident recovery.
+- We meet our 10k TPS at <20ms latency requirement.
+
+**Negative (Technical Debt Accepted):**
+- We accept vendor lock-in to Confluent.
+- Data egress costs will increase by approximately $1,200/month as data moves between AWS and the Confluent VPC.
+
+**Reversibility Assessment:**
+This is a **1-Way Door**. Replacing the event broker will require refactoring 14 downstream microservices, taking approximately 12 Engineering Weeks. We accept this lock-in risk based on Confluent's SLA guarantees.
+
+---
+
+## 7. Quality Checklist
 
 Before approving an ADR, verify:
 
 - [ ] Title is a clear decision statement (not a question or vague topic)
-- [ ] Context includes the problem, constraints, and forces
-- [ ] At least 2 alternatives are evaluated with criteria
-- [ ] Trade-off analysis uses weighted scoring (not just "gut feel")
-- [ ] Consequences include BOTH positive and negative impacts
+- [ ] Context includes the problem, explicit constraints, and forces
+- [ ] At least 2 alternatives are evaluated with a mathematical weighted scoring matrix
+- [ ] Consequences include BOTH positive and negative impacts explicitly
+- [ ] Reversibility (1-Way vs 2-Way Door) is explicitly declared
 - [ ] Risks have mitigation strategies
-- [ ] The decision is traceable to a business need
+- [ ] The decision is traceable to a business need or incident
 - [ ] Status is correctly set
-- [ ] References are included for external sources
+- [ ] References and load-test benchmark scripts are included
+- [ ] Spectral CI Linter rules pass successfully for the markdown structure
 
 ---
 
-## 7. Common ADR Anti-Patterns
+## 8. Common ADR Anti-Patterns & Catastrophes
 
-| Anti-Pattern | Problem | Fix |
+| Anti-Pattern | Problem / Catastrophic Result | Enterprise Fix |
 |-------------|---------|-----|
-| "We chose X because it's popular" | No analysis, bandwagon fallacy | Evaluate against YOUR constraints |
-| Only one option presented | Bias confirmation, no real decision | Always show 2+ alternatives |
-| All pros, no cons | Dishonest, hides future problems | Every option has trade-offs — document them |
-| 500-word context, 1-line decision | Effort in wrong place | Decision + reasoning MUST be the strongest section |
-| "Decided in meeting" with no ADR | Lost institutional knowledge | If it's worth deciding, it's worth recording |
-| Never updating status | Stale decisions cause confusion | Review quarterly, mark deprecated/superseded |
-| Too many ADRs for trivial choices | ADR fatigue, noise | Only architect-level decisions need ADRs |
+| The "Echo Chamber" / Single Option | Confirmation bias. The business adopts suboptimal tech. | The ARB MUST reject any ADR lacking a weighted scoring matrix with at least 2 viable options. |
+| The "Hype Driven" Choice | Adopting a technology "because Google uses it," leading to massive over-engineering. | Force the author to score "Team Expertise" and "3-Year TCO" with high weights. |
+| All pros, no cons | Dishonest, hides future problems. The team is blindsided later. | The "Negative Consequences" section is mandatory. If omitted, the ADR is rejected. |
+| 500-word context, 1-line decision | Effort in wrong place. | Decision + reasoning MUST be the strongest section based on the matrix. |
+| The Oral Tradition | "We decided in a meeting." Lost institutional knowledge. | If it takes longer than 15 minutes of debate, it requires an ADR. No code merges without it. |
+| The Zombie ADR | Stale decisions cause confusion. Developers implement deprecated patterns. | Review quarterly, mark deprecated/superseded using `log4brains`. |
+| The Overloaded ADR | Trying to choose the Database, Auth provider, and Frontend in one document. | Break decisions down. One ADR = One Decision. |
+| The "Missing Benchmark" | Claiming "Tech X is 10x faster than Y" without proof. | Require linked, reproducible `k6` load testing scripts for any performance claims. |
 
 ---
 
-## 8. Example Decision Topics
+## 9. Spectral Linter YAML Configuration
 
-For reference, here are common enterprise architecture decisions that SHOULD have ADRs:
+To mechanically enforce this structure in your CI pipeline, add the following to your `.spectral.yaml`.
 
-**Data Layer:**
-- Primary database technology, Read replicas vs CQRS, Caching strategy, Data partitioning approach
-
-**Communication:**
-- Sync vs async communication, Message broker choice, API protocol (REST vs GraphQL vs gRPC)
-
-**Infrastructure:**
-- Cloud provider, Container orchestration, CDN choice, DNS strategy, Multi-region approach
-
-**Security:**
-- Authentication provider, Token strategy, Encryption approach, API gateway selection
-
-**Architecture Style:**
-- Monolith vs microservices, Event sourcing vs CRUD, Serverless vs containerized
-
-**DevOps:**
-- CI/CD platform, GitFlow vs trunk-based, Deployment strategy, IaC tooling
+```yaml
+rules:
+  adr-title-format:
+    description: "ADR Title must start with ADR-"
+    given: "$.title"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^ADR-\\d{3}:"
+  adr-requires-status:
+    description: "ADR must contain a formal status"
+    given: "$.status"
+    then:
+      function: enumeration
+      functionOptions:
+        values: ["Proposed", "Accepted", "Rejected", "Deprecated", "Superseded"]
+  adr-requires-consequences:
+    description: "ADR must explicitly list negative consequences"
+    given: "$.consequences.negative"
+    then:
+      function: truthy
+  adr-requires-reversibility:
+    description: "Must declare if decision is a 1-Way or 2-Way door"
+    given: "$.reversibility"
+    then:
+      function: truthy
+```
 
 ---
 
