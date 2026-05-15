@@ -121,7 +121,7 @@ graph TD
 
 ```
 archpilot/
-├── rules/                              # 🧠 Architecture Standards & Guidelines (36 files)
+├── rules/                              # 🧠 Architecture Standards & Guidelines (37 files)
 │   ├── 00-architecture-principles.md   # Universal design principles, decision framework
 │   ├── 01-solution-design.md           # SDD standards, when HLD vs LLD vs SDD
 │   ├── 02-adr-standards.md             # ADR writing standards & lifecycle
@@ -157,9 +157,11 @@ archpilot/
 │   ├── 32-data-contracts.md            # Producer/consumer contracts, schema drift
 │   ├── 33-resilience-chaos-engineering.md  # GameDays, fault injection, blast radius
 │   ├── 34-sustainability-green-architecture.md  # Carbon-aware, GreenOps, SCI
-│   └── 35-multi-agent-contracts.md     # Artifact-driven agent handoffs, trust hierarchy
+│   ├── 35-multi-agent-contracts.md     # Artifact-driven agent handoffs, trust hierarchy
+│   └── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
 │
-├── templates/                          # 📝 Document Templates (16 files)
+├── templates/                          # 📝 Document Templates (17 files)
+│   ├── discovery-template.md           # Ambiguity resolution & presales template
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
 │   ├── hld-template.md                 # High-Level Design (14 sections)
 │   ├── sdd-template.md                 # Solution Design Document (11 sections)
