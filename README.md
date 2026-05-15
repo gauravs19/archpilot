@@ -17,7 +17,7 @@
 
 ## ⚡ The Pain Point
 
-LLMs are great at code, but they often **hallucinate** architecure:
+LLMs are great at code, but they often **hallucinate** architecture:
 - They ignore non-functional requirements (NFRs).
 - They mix up HLD vs LLD vs SDD.
 - They suggest insecure or non-compliant design patterns.
@@ -149,15 +149,15 @@ archpilot/
 │   ├── 24-team-topology.md             # Conway's Law, team types, scaling teams
 │   ├── 25-domain-driven-design.md      # Bounded contexts, aggregates, events, DDD
 │   ├── 26-ai-ml-architecture.md        # MLOps, model serving, feature stores, AI
-│   ├── 27-spec-driven-development.md   # ⭐ NEW: SDD, EARS notation, Spec-Kit workflow
-│   ├── 28-context-engineering.md       # ⭐ NEW: LLM context design, RAG, token budgets
-│   ├── 29-agentic-ai-governance.md     # ⭐ NEW: Agent safety, HITL, audit, blast radius
-│   ├── 30-platform-engineering.md      # ⭐ NEW: IDP, golden paths, developer portal
-│   ├── 31-api-governance.md            # ⭐ NEW: API lifecycle, productization, DX
-│   ├── 32-data-contracts.md            # ⭐ NEW: Producer/consumer contracts, schema drift
-│   ├── 33-resilience-chaos-engineering.md  # ⭐ NEW: GameDays, fault injection, blast radius
-│   ├── 34-sustainability-green-architecture.md  # ⭐ NEW: Carbon-aware, GreenOps, SCI
-│   └── 35-multi-agent-contracts.md     # ⭐ NEW: Artifact-driven agent handoffs, trust hierarchy
+│   ├── 27-spec-driven-development.md   # SDD, EARS notation, Spec-Kit workflow
+│   ├── 28-context-engineering.md       # LLM context design, RAG, token budgets
+│   ├── 29-agentic-ai-governance.md     # Agent safety, HITL, audit, blast radius
+│   ├── 30-platform-engineering.md      # IDP, golden paths, developer portal
+│   ├── 31-api-governance.md            # API lifecycle, productization, DX
+│   ├── 32-data-contracts.md            # Producer/consumer contracts, schema drift
+│   ├── 33-resilience-chaos-engineering.md  # GameDays, fault injection, blast radius
+│   ├── 34-sustainability-green-architecture.md  # Carbon-aware, GreenOps, SCI
+│   └── 35-multi-agent-contracts.md     # Artifact-driven agent handoffs, trust hierarchy
 │
 ├── templates/                          # 📝 Document Templates (16 files)
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
@@ -171,25 +171,25 @@ archpilot/
 │   ├── handover-checklist.md           # System transition / KT checklist
 │   ├── capacity-planning.md            # Infrastructure capacity forecast
 │   ├── technology-radar.md             # Org technology landscape tracker
-│   ├── spec-template.md                # ⭐ NEW: Spec-Kit requirements.md (EARS notation)
-│   ├── design-spec-template.md         # ⭐ NEW: Spec-Kit design.md (architecture + schemas)
-│   ├── task-list-template.md           # ⭐ NEW: Spec-Kit tasks.md (atomic agent tasks)
-│   ├── constitution-template.md        # ⭐ NEW: Project constitution / AI agent law
-│   ├── data-contract-template.md       # ⭐ NEW: Producer/consumer data contract
-│   └── multi-agent-handoff-template.md # ⭐ NEW: Handoff contract for orchestrator/sub-agents
+│   ├── spec-template.md                # Spec-Kit requirements.md (EARS notation)
+│   ├── design-spec-template.md         # Spec-Kit design.md (architecture + schemas)
+│   ├── task-list-template.md           # Spec-Kit tasks.md (atomic agent tasks)
+│   ├── constitution-template.md        # Project constitution / AI agent law
+│   ├── data-contract-template.md       # Producer/consumer data contract
+│   └── multi-agent-handoff-template.md # Handoff contract for orchestrator/sub-agents
 │
 ├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
 │   ├── claude-project-instructions.md  # Ready for Claude Projects
 │   ├── chatgpt-custom-gpt.md           # ChatGPT Custom GPT configuration
 │   ├── vscode-copilot-instructions.md  # GitHub Copilot (.github/copilot-instructions.md)
 │   ├── cursor-rules.md                 # Cursor IDE (.cursorrules)
-│   ├── kiro-steering-instructions.md   # ⭐ NEW: AWS Kiro steering file (.kiro/steering/)
+│   ├── kiro-steering-instructions.md   # AWS Kiro steering file (.kiro/steering/)
 │   └── personas/
 │       ├── enterprise-architect.md     # Senior architect persona
 │       ├── security-architect.md       # Security architecture reviewer
 │       ├── presales-solutioner.md      # Presales / proposal persona
 │       ├── startup-cto.md             # Startup / MVP-first persona
-      └── vibe-code-reviewer.md      # Production review of AI-generated code
+│       └── vibe-code-reviewer.md      # Production review of AI-generated code
 │
 ├── examples/                           # 📄 Sample Outputs
 │   ├── sample-lld.md                   # Notification Service — full LLD example
@@ -202,7 +202,7 @@ archpilot/
 └── README.md                           # This file
 ```
 
-**Total: 69 files | ~760 KB of enterprise architecture standards**
+**Total: 36 rules | 17 templates | 5 LLM configs | ~410 KB of enterprise architecture standards**
 
 ---
 
@@ -210,12 +210,12 @@ archpilot/
 
 | # | Rule File | What It Covers | Size |
 |---|-----------|---------------|:----:|
-| 00 | **Architecture Principles** | SOLID, SoC, API-First, Fail Fast, Least Privilege, FinOps, decision framework | 12.5 KB |
-| 01 | **Solution Design** | SDD standards, when to use HLD vs LLD vs SDD, mandatory sections | 5.0 KB |
-| 02 | **ADR Standards** | When to write, lifecycle, trade-off matrices, quality checklist, anti-patterns | 8.6 KB |
-| 03 | **HLD Standards** | C4 diagrams, integration architecture, NFR summary, cost estimates | 6.9 KB |
-| 04 | **LLD Standards** | 11 mandatory sections, API specs, DB schemas, error handling, security | 14.0 KB |
-| 05 | **API Design** | REST conventions, status codes, error format, pagination, versioning, rate limiting | 8.6 KB |
+| 00 | **Architecture Principles** | SOLID, SoC, API-First, engineering physics, fitness functions, GreenOps | 25 KB |
+| 01 | **Solution Design** | SDD standards, queueing calculus, STRIDE threat modelling, 3-year TCO | 14.5 KB |
+| 02 | **ADR Standards** | Lifecycle, DAG governance, Weighted Product Model scoring, CI drift detection | 13.6 KB |
+| 03 | **HLD Standards** | C4 diagrams, Integration Calculus, capacity planning, network egress math | 7.6 KB |
+| 04 | **LLD Standards** | SOLID physics, Saga patterns, indexing math, distributed locking, Hexagonal arch | 14.4 KB |
+| 05 | **API Design** | REST, gRPC Protobuf, GraphQL DataLoaders, RFC 7807 errors, Spectral CI linting | 10.9 KB |
 | 06 | **Data Architecture** | Data modeling, storage selection matrix, governance, PII, migrations, indexing | 9.5 KB |
 | 07 | **Security Architecture** | Zero trust, OAuth2/JWT, RBAC/ABAC, encryption, STRIDE, OWASP, compliance | 11.0 KB |
 | 08 | **Cloud Architecture** | 12-Factor App, compute selection, IaC, VPC networking, HA/DR tiers | 8.6 KB |
@@ -361,6 +361,14 @@ Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your
 - **Data Contract Template:** Fully structured YAML + field definition table
 - **Multi-Agent Handoff Template:** Structured contract for orchestrator to sub-agent delegation
 - **AWS Kiro Steering File:** kiro-steering-instructions.md for native SDD enforcement in Kiro
+- **Enterprise Hardening (Rules 00–05):** All core rules expanded to 500+ lines with mathematical rigor, engineering physics, and CI fitness functions
+
+### 🔭 Phase 7 — Automated Enforcement (Planned)
+- **`archpilot-reviewer` GitHub Action:** Automated PR auditing against NFR, Security, and ADR compliance gates
+- **Drift Detection Script:** Verify implementation code has not deviated from `design.md` or `data-contract.md`
+- **MCP Server:** Package all rules as a Model Context Protocol server for direct LLM integration without file uploads
+- **Fitness Function Runner:** CLI-based ArchUnit/Spectral linter that gates merges on architectural compliance
+- **ADR DAG Visualizer:** Generate a living graph of all decision records and their supersession chains
 
 ---
 
