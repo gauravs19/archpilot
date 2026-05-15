@@ -161,11 +161,31 @@ archpilot/
 │   └── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
 │
 ├── tools/                              # 🛠️ Executable Tools
-│   └── nfr_calculator.py               # Calculates TPS, bandwidth, and IOPS via Little's Law
-├── diagrams/                           # 📊 Mermaid Archetype Library
-│   ├── 01-c4-context-archetype.md      # C4 standard color palette & layout
-│   ├── 02-saga-choreography-archetype.md # Distributed transaction rollback sequences
-│   └── 03-active-active-failover.md    # Multi-region HA topologies
+│   ├── nfr_calculator.py               # Enterprise NFR physics (50+ metrics, Little's Law, IOPS)
+│   └── generate_diagrams.py            # Generator for standard Mermaid archetypes
+├── diagrams/                           # 📊 Mermaid Archetype Library (22+ Patterns)
+│   ├── 01-c4-context-archetype.md      # C4 Context layout
+│   ├── 02-saga-choreography-archetype.md # Distributed transaction rollback
+│   ├── 03-active-active-failover.md    # Multi-region HA
+│   ├── 04-api-gateway-pattern.md       # API Gateway routing
+│   ├── 05-event-sourcing-cqrs.md       # Command/Query segregation
+│   ├── 06-strangler-fig-pattern.md     # Monolith strangulation
+│   ├── 07-micro-frontend-pattern.md    # MFE shell/remote
+│   ├── 08-outbox-pattern.md            # Transactional Outbox
+│   ├── 09-circuit-breaker-pattern.md   # Circuit Breaker state machine
+│   ├── 10-service-mesh-sidecar.md      # Envoy sidecar mesh
+│   ├── 11-oauth2-oidc-flow.md          # OIDC sequence diagram
+│   ├── 12-bulkhead-pattern.md          # Thread pool isolation
+│   ├── 13-fan-out-fan-in.md            # Worker aggregation
+│   ├── 14-change-data-capture-cdc.md   # Debezium CDC pipeline
+│   ├── 15-two-phase-commit-2pc.md      # Distributed commit (XA)
+│   ├── 16-backends-for-frontends-bff.md# BFF pattern
+│   ├── 17-serverless-lambda-arch.md    # AWS Serverless flow
+│   ├── 18-data-lake-medallion.md       # Bronze/Silver/Gold Lake
+│   ├── 19-cell-based-architecture.md   # Cellular partitioned DBs
+│   ├── 20-blue-green-deployment.md     # Deployment traffic splitting
+│   ├── 21-cache-aside-pattern.md       # Redis read-through flow
+│   └── 22-retry-exponential-backoff.md # Exponential backoff sequence
 ├── templates/                          # 📝 Document Templates (19 files)
 │   ├── discovery-template.md           # Ambiguity resolution & presales template
 │   ├── assumption-log-template.md      # RAID / Assumption tracking template
