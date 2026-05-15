@@ -160,8 +160,10 @@ archpilot/
 │   ├── 35-multi-agent-contracts.md     # Artifact-driven agent handoffs, trust hierarchy
 │   └── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
 │
-├── templates/                          # 📝 Document Templates (17 files)
+├── templates/                          # 📝 Document Templates (19 files)
 │   ├── discovery-template.md           # Ambiguity resolution & presales template
+│   ├── assumption-log-template.md      # RAID / Assumption tracking template
+│   ├── estimation-abacus-template.md   # Fixed-bid presales estimation framework
 │   ├── lld-template.md                 # Low-Level Design (13 sections)
 │   ├── hld-template.md                 # High-Level Design (14 sections)
 │   ├── sdd-template.md                 # Solution Design Document (11 sections)
