@@ -86,7 +86,9 @@ graph TD
 
 ---
 
-## 🚀 Quick Start (2 Minutes)
+## 🚀 Quick Start & User Guide
+
+**📖 Read the full [End-to-End User Guide](docs/user-guide.md) to see how to run the complete Archpilot workflow from Phase 0 Discovery to Phase 3 Execution.**
 
 ### Option A: Claude Projects
 1. Create a new [Claude Project](https://claude.ai)
