@@ -2,7 +2,37 @@
 
 This directory contains executable tools and scripts to support the Archpilot framework.
 
-## 1. NFR Physics Calculator (`nfr_calculator.py`)
+## 1. Agentic Pipeline (`pipeline.py`)
+
+The 5-phase agentic engine. Takes a project directory containing `Input.md` and runs SE Agent → PO Agent → Arch Agent (HLD) → Arch Agent (LLD×N) → Review Agent, writing each artifact to `.specs/`.
+
+### Usage
+```bash
+# Run via the CLI (recommended)
+python archpilot.py run my-project
+
+# Or invoke directly
+python tools/pipeline.py --project my-project --phases 0,1,2,3,4
+```
+
+### Phase outputs
+| Phase | Agent | Output file |
+|-------|-------|------------|
+| 0 | SE Agent | `discovery.md` |
+| 1 | PO Agent | `requirements.md` |
+| 2 | Arch Agent | `Design_HLD.md` |
+| 3 | Arch Agent | `Design_LLD_<ServiceName>.md` × 3–5 |
+| 4 | Review Agent | `review_report.md` |
+
+### Environment
+Requires `ANTHROPIC_API_KEY`. When running inside Claude Code without an API key, Claude Code itself acts as each agent phase and writes artifacts directly via the Write tool.
+
+### Quality gate
+Phase 4 produces a score from 0–100. Score ≥ 80 = **PROCEED**. Score < 80 = **REVISE** with blocking findings listed.
+
+---
+
+## 2. NFR Physics Calculator (`nfr_calculator.py`)
 
 A command-line utility that calculates the architectural physics required to support your Non-Functional Requirements (NFRs). It applies Little's Law for compute concurrency, estimates cross-AZ network egress costs, and calculates raw storage capacity.
 
