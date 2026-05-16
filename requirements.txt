@@ -1,0 +1,4 @@
+# Archpilot Pipeline Dependencies
+# Install with: pip install -r requirements.txt
+
+anthropic>=0.40.0
