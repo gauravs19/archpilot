@@ -236,6 +236,11 @@ footer{background:var(--bg-alt2);border-top:1px solid var(--border);padding:40px
 .ears-table td:nth-child(2){font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#7C3AED;background:#FAF5FF}
 .ears-table td:nth-child(3){color:var(--slate);font-size:.82rem}
 
+/* ── EXAMPLE SECTION ── */
+#example [style*="grid-template-columns:repeat(4,1fr)"]{}
+@media(max-width:900px){#example div[style*="repeat(4,1fr)"]{grid-template-columns:1fr 1fr!important}}
+@media(max-width:500px){#example div[style*="repeat(4,1fr)"]{grid-template-columns:1fr!important}}
+
 /* ── REVIEW SCORE CARD ── */
 .score-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;box-shadow:var(--shadow);display:flex;align-items:center;gap:20px}
 .score-ring{width:72px;height:72px;flex-shrink:0}
@@ -258,6 +263,7 @@ footer{background:var(--bg-alt2);border-top:1px solid var(--border);padding:40px
     <a href="#pipeline">Pipeline</a>
     <a href="#rules">Rule Library</a>
     <a href="#spec-kit">Spec-Kit</a>
+    <a href="#example">Example</a>
     <a href="#platforms">Platforms</a>
     <a href="#quickstart">Quick Start</a>
   </div>
@@ -784,6 +790,87 @@ cp templates/constitution-template.md <span class="hl-str">constitution.md</span
       <div class="usecase-desc">Generate bottom-up effort estimates using PERT analysis and complexity multipliers. Produce 3-year TCO models with Little's Law physics and FinOps-aligned cost architectures.</div>
       <div class="usecase-rules"><span class="rule-tag">Rule 14</span><span class="rule-tag">Rule 16</span><span class="rule-tag">Estimation Example</span></div>
     </div>
+  </div>
+</div>
+</section>
+<div class="divider"></div>
+
+<!-- EXAMPLE RUN -->
+<section class="section section--alt" id="example">
+<div class="container">
+  <div class="section-label">Real Pipeline Run</div>
+  <h2 class="section-title">DroneOps Fleet Management — End-to-End Example</h2>
+  <p class="section-sub" style="margin-bottom:36px">A complete pipeline run against a real enterprise requirement. Eight production-grade artifacts generated from a single Input.md. Score: 94.1/100.</p>
+
+  <!-- Score strip -->
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:36px">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--navy)">94.1</div>
+      <div style="font-size:.75rem;color:var(--slate);font-weight:500;margin-top:2px">Review Score / 100</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--navy)">12</div>
+      <div style="font-size:.75rem;color:var(--slate);font-weight:500;margin-top:2px">Epics</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--navy)">68</div>
+      <div style="font-size:.75rem;color:var(--slate);font-weight:500;margin-top:2px">EARS Stories</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:1.6rem;font-weight:800;color:var(--navy)">3</div>
+      <div style="font-size:.75rem;color:var(--slate);font-weight:500;margin-top:2px">LLD Services</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;flex:1;min-width:140px;text-align:center">
+      <div style="font-size:1.6rem;font-weight:800;color:#16A34A">PROCEED</div>
+      <div style="font-size:.75rem;color:var(--slate);font-weight:500;margin-top:2px">Gate Decision</div>
+    </div>
+  </div>
+
+  <!-- Artifact cards -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px">
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/Input.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Input</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">Input.md</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">Original requirement — multi-tenant drone fleet SaaS, $2M MVP budget</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/discovery.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 0 — SE Agent</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">discovery.md</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">15 dimensions · Little's Law · $10.09M TCO · STRIDE · CAP decisions</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/requirements.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 1 — PO Agent</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">requirements.md</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">12 Epics · 68 EARS stories · MoSCoW · RTM · Definition of Done</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/Design_HLD.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 2 — Arch Agent</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">Design_HLD.md</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">C4 diagrams · 4 ADRs · $18.3K/month cost model · zero-trust security</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/Design_LLD_Telemetry_Processor.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 3 — LLD #1</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">Telemetry Processor</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">Go · Avro schema · Timestream · Redis dedup · KEDA ScaledObject YAML</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/Design_LLD_Mission_Planning_Service.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 3 — LLD #2</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">Mission Planning</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">Python · 8-state FSM · PostGIS geofence · LAANC auth · KMS token signing</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/Design_LLD_Incident_Detection_Service.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 3 — LLD #3</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">Incident Detection</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">Python · Welford anomaly detection · Redis sliding windows · heartbeat scanner</div>
+    </a>
+    <a href="https://github.com/gauravs19/archpilot/blob/main/examples/droneops-fleet-management/review_report.md" target="_blank" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;transition:all .2s;display:block;text-decoration:none" onmouseover="this.style.borderColor='#93C5FD';this.style.boxShadow='0 4px 6px rgba(0,0,0,.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-light);margin-bottom:6px">Phase 4 — Review Agent</div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:4px">review_report.md</div>
+      <div style="font-size:.75rem;color:var(--slate);line-height:1.4">12-dimension audit · 16 findings · PROCEED gate at 94.1/100</div>
+    </a>
+  </div>
+  <div style="text-align:center;margin-top:8px">
+    <a href="https://github.com/gauravs19/archpilot/tree/main/examples/droneops-fleet-management" target="_blank" class="btn btn-outline">Browse All Artifacts on GitHub &#8594;</a>
   </div>
 </div>
 </section>
