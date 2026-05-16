@@ -45,13 +45,51 @@ If you find Archpilot useful, please consider:
 
 ## 🎯 What is Archpilot?
 
-Archpilot is a **repository of rule files, templates, and AI instructions** that you plug into any LLM (Claude, ChatGPT, Gemini, Copilot, Cursor) to make it produce consistent, enterprise-grade architecture artifacts.
+Archpilot is two things in one repository:
 
-**It is NOT a CLI tool or application.** It is a **standards library** — think of it as `.eslintrc` but for enterprise architecture.
+| Mode | What it does | When to use |
+|------|-------------|-------------|
+| **Agentic Pipeline** | `archpilot run` — takes one requirement, runs 5 AI agent phases, produces 6 production-grade artifacts automatically | Greenfield projects, new services, ARB submissions |
+| **Standards Library** | 36 rule files + 17 templates you load into Claude, Cursor, Kiro, or Copilot | Code reviews, ad-hoc design, enforcing standards in an existing project |
+
+Both modes share the same rules and templates. The pipeline automates the workflow the library supports manually.
 
 ---
 
-## 🏗️ How it Works (Logical View)
+## 🚀 Agentic Pipeline — How it Works
+
+Give Archpilot a single requirement. Five AI agent phases produce a complete, lint-clean architecture package:
+
+```mermaid
+graph LR
+    Input["📋 Requirement\n(Input.md)"]
+    P0["Phase 0\nSE Agent\nDiscovery"]
+    P1["Phase 1\nPO Agent\nRequirements"]
+    P2["Phase 2\nArch Agent\nHLD"]
+    P3["Phase 3\nArch Agent\nLLD × 3–5"]
+    P4["Phase 4\nReview Agent\nGuardrail Audit"]
+    Gate{"Score ≥ 80?"}
+    Out["✅ Production-Ready\nArtifacts"]
+
+    Input --> P0 --> P1 --> P2 --> P3 --> P4 --> Gate
+    Gate -->|PROCEED| Out
+    Gate -->|REVISE| P0
+```
+
+**Rule 50 / 10:10:15:50 Mandate** enforces minimum quality at every gate:
+- ≥ 15 discovery dimensions (quantified, not adjectives)
+- 10–20 Epics, 50–150 EARS-notation User Stories
+- 3–5 LLDs with class diagrams, schemas, sequence diagrams, and KEDA YAMLs
+- Review score ≥ 80/100 to PROCEED
+
+📖 **[Full User Guide →](docs/user-guide.md)**  
+📂 **[DroneOps Reference Example →](examples/droneops-fleet-management/)** — 94.1/100 on a real enterprise requirement
+
+---
+
+## 🏗️ Standards Library — How it Works
+
+Plug Archpilot rule files into any LLM to enforce consistent, enterprise-grade design:
 
 ```mermaid
 graph TD
@@ -86,16 +124,27 @@ graph TD
 
 ---
 
-## 🚀 Quick Start & User Guide
+## 🚀 Quick Start
 
-**📖 Read the full [End-to-End User Guide](docs/user-guide.md) to see how to run the complete Archpilot workflow from Phase 0 Discovery to Phase 3 Execution.**
-
-### The Archpilot CLI (New!)
-Initialize a project and lint your specs automatically:
+### Pipeline Mode (recommended)
 ```bash
-python archpilot.py init  # Scaffolds .specs/ directory
-python archpilot.py lint  # Scans .specs/ for rule violations
+# Initialize a new project
+python archpilot.py init my-project
+
+# Paste your requirement into my-project/.specs/Input.md
+# Then run all 5 phases
+python archpilot.py run my-project
+
+# Validate all artifacts (tier 3 = strictest)
+python archpilot.py lint --tier 3 --dir my-project
+
+# Review a specific artifact
+python archpilot.py review --file my-project/.specs/Design_HLD.md
 ```
+
+**📖 [Full User Guide →](docs/user-guide.md)** | **📂 [DroneOps Example →](examples/droneops-fleet-management/)**
+
+### Standards Library Mode
 
 ### Option A: Claude Projects
 1. Create a new [Claude Project](https://claude.ai)
@@ -130,7 +179,13 @@ python archpilot.py lint  # Scans .specs/ for rule violations
 
 ```
 archpilot/
-├── rules/                              # 🧠 Architecture Standards & Guidelines (37 files)
+├── archpilot.py                        # 🚀 CLI entry point (init, run, review, lint)
+├── tools/                              # 🛠️ Executable Tools
+│   ├── pipeline.py                     # 5-phase agentic engine (Anthropic SDK)
+│   ├── nfr_calculator.py               # Enterprise NFR physics (Little's Law, IOPS, egress)
+│   └── generate_diagrams.py            # Generator for standard Mermaid archetypes
+├── rules/                              # 🧠 Architecture Standards & Guidelines (50 files)
+│   ├── 50-agent-pipeline.md            # ⭐ Rule 50: 10:10:15:50 Mandate (pipeline gate)
 │   ├── 00-architecture-principles.md   # Universal design principles, decision framework
 │   ├── 01-solution-design.md           # SDD standards, when HLD vs LLD vs SDD
 │   ├── 02-adr-standards.md             # ADR writing standards & lifecycle
@@ -170,10 +225,6 @@ archpilot/
 │   ├── 36-discovery-ambiguity.md       # Phase 0: Presales ambiguity resolution, edge cases
 │   └── 37-sdd-triage-matrix.md         # SDD Fast-Track / Bypassing matrix
 │
-├── archpilot.py                        # 🚀 The Archpilot CLI (init & lint)
-├── tools/                              # 🛠️ Executable Tools
-│   ├── nfr_calculator.py               # Enterprise NFR physics (50+ metrics, Little's Law, IOPS)
-│   └── generate_diagrams.py            # Generator for standard Mermaid archetypes
 ├── diagrams/                           # 📊 Mermaid Archetype Library (22+ Patterns)
 │   ├── 01-c4-context-archetype.md      # C4 Context layout
 │   ├── 02-saga-choreography-archetype.md # Distributed transaction rollback
@@ -232,7 +283,16 @@ archpilot/
 │       ├── startup-cto.md             # Startup / MVP-first persona
 │       └── vibe-code-reviewer.md      # Production review of AI-generated code
 │
-├── examples/                           # 📄 Sample Outputs
+├── examples/                           # 📄 Sample Outputs & Reference Runs
+│   ├── droneops-fleet-management/      # ⭐ Full pipeline run — 94.1/100 (8 artifacts)
+│   │   ├── Input.md                    # Original requirement
+│   │   ├── discovery.md                # Phase 0: 15-dimension deep discovery
+│   │   ├── requirements.md             # Phase 1: 12 Epics, 68 User Stories (EARS)
+│   │   ├── Design_HLD.md               # Phase 2: C4 diagrams, 4 ADRs, cost model
+│   │   ├── Design_LLD_Telemetry_Processor.md     # Phase 3: Go service
+│   │   ├── Design_LLD_Mission_Planning_Service.md # Phase 3: Python FastAPI
+│   │   ├── Design_LLD_Incident_Detection_Service.md # Phase 3: Anomaly detection
+│   │   └── review_report.md            # Phase 4: 94.1/100 — PROCEED
 │   ├── sample-lld.md                   # Notification Service — full LLD example
 │   ├── sample-hld.md                   # E-Commerce Platform — full HLD example
 │   ├── sample-adr.md                   # PostgreSQL vs DynamoDB — full ADR example
@@ -240,10 +300,13 @@ archpilot/
 │   ├── sample-migration-plan.md        # Monolith → Microservices migration plan
 │   └── sample-estimation.md            # Bottom-up effort estimation example
 │
+├── docs/                               # 📖 Documentation
+│   ├── user-guide.md                   # End-to-end user guide (pipeline + library modes)
+│   └── index.html                      # Project landing page
 └── README.md                           # This file
 ```
 
-**Total: 36 rules | 17 templates | 5 LLM configs | ~410 KB of enterprise architecture standards**
+**Total: 50 rules | 17 templates | 5 LLM configs | 5-phase agentic pipeline | ~500 KB of enterprise architecture standards**
 
 ---
 
@@ -404,7 +467,16 @@ Add [`workflows/archpilot-review.yml`](./workflows/archpilot-review.yml) to your
 - **AWS Kiro Steering File:** kiro-steering-instructions.md for native SDD enforcement in Kiro
 - **Enterprise Hardening (Rules 00–05):** All core rules expanded to 500+ lines with mathematical rigor, engineering physics, and CI fitness functions
 
-### 🔭 Phase 7 — Automated Enforcement (Planned)
+### ⭐ Phase 7 — Agentic Pipeline (Complete)
+- **5-Phase Agentic Engine (`tools/pipeline.py`):** SE Agent → PO Agent → Arch Agent → Review Agent, all orchestrated via Anthropic SDK
+- **Rule 50 / 10:10:15:50 Mandate:** Enforces ≥15 discovery dimensions, 10–20 Epics, 50–150 Stories, 3–5 LLDs, ≥80 review score
+- **`archpilot run` CLI command:** Single command to run all 5 phases against a project directory
+- **Tier 3 Lint Engine:** Vague-word detector, placeholder scanner, narrative-section checker
+- **Discovery Template (15 dimensions):** Physics, cost, STRIDE, CAP, RPO/RTO, edge cases
+- **Requirements Breakdown Template:** EARS notation, MoSCoW, NFR tags, RTM
+- **DroneOps Reference Run:** Full end-to-end example at `examples/droneops-fleet-management/` (94.1/100)
+
+### 🔭 Phase 8 — Automated Enforcement (Planned)
 - **`archpilot-reviewer` GitHub Action:** Automated PR auditing against NFR, Security, and ADR compliance gates
 - **Drift Detection Script:** Verify implementation code has not deviated from `design.md` or `data-contract.md`
 - **MCP Server:** Package all rules as a Model Context Protocol server for direct LLM integration without file uploads
