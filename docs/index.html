@@ -48,9 +48,8 @@ code,pre{font-family:'JetBrains Mono',monospace}
 /* ── NAV ── */
 nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;gap:24px;overflow:hidden}
-.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--navy)}
-.nav-logo img{height:24px;width:auto;max-height:24px;max-width:120px;object-fit:contain;flex-shrink:0;display:block;align-self:center}
-.nav-logo span{color:var(--blue-light)}
+.nav-logo{display:flex;align-items:center;height:40px;overflow:hidden;flex-shrink:0}
+.nav-logo img{height:40px;width:auto;max-width:160px;object-fit:contain;display:block}
 .nav-links{display:flex;align-items:center;gap:28px}
 .nav-links a{font-size:.875rem;font-weight:500;color:var(--slate);transition:color .15s}
 .nav-links a:hover{color:var(--navy)}
@@ -256,8 +255,7 @@ footer{background:var(--bg-alt2);border-top:1px solid var(--border);padding:40px
 <nav>
 <div class="container nav-inner">
   <a href="#" class="nav-logo">
-    <img src="logo.png" alt="Archpilot" onerror="this.style.display='none'">
-    <span>Arch</span>pilot
+    <img src="logo.png" alt="Archpilot">
   </a>
   <div class="nav-links">
     <a href="#pipeline">Pipeline</a>
