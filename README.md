@@ -512,3 +512,13 @@ making enterprise architecture consistent, teachable, and AI-augmented.
 ---
 
 *Created by [Gaurav Sharma](https://gauravs19.github.io/portfolio/) — 18+ Years of Architecture Delivery*
+
+
+---
+
+## Ecosystem
+
+| Tool | Description |
+|---|---|
+| [archpilot-cli](https://github.com/gauravs19/archpilot-cli) | CLI to scaffold architecture documents from this standards library |
+| [archpilot-reviewer](https://github.com/gauravs19/archpilot-reviewer) | GitHub Action for automated architecture governance on PRs |
