@@ -254,7 +254,7 @@ sequenceDiagram
 }
 
 def main():
-    target_dir = r"d:\_elfor\code\ag-wks\archpilot\diagrams"
+    target_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "diagrams")
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
         

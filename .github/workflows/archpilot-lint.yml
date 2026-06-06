@@ -1,0 +1,33 @@
+name: Archpilot Lint
+
+on:
+  pull_request:
+    paths:
+      - '.specs/**'
+      - 'rules/**'
+      - 'templates/**'
+  push:
+    branches: [main]
+    paths:
+      - '.specs/**'
+
+jobs:
+  lint:
+    name: Lint architecture specs (Tier 2)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Archpilot linter
+        run: python archpilot.py lint --dir . --tier 2
