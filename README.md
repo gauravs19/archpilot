@@ -50,7 +50,8 @@ Archpilot is two things in one repository:
 | Mode | What it does | When to use |
 |------|-------------|-------------|
 | **Agentic Pipeline** | `archpilot run` — takes one requirement, runs 5 AI agent phases, produces 6 production-grade artifacts automatically | Greenfield projects, new services, ARB submissions |
-| **Standards Library** | 36 rule files + 17 templates you load into Claude, Cursor, Kiro, or Copilot | Code reviews, ad-hoc design, enforcing standards in an existing project |
+| **Standards Library** | 37 rule files + 17 templates you load into Claude, Cursor, Kiro, Copilot, Gemini, Windsurf, or Aider | Code reviews, ad-hoc design, enforcing standards in an existing project |
+| **MCP Server** | `python mcp_server.py` — exposes all rules, templates, and tools via MCP protocol for Claude Code and Claude.ai | Native LLM integration without copy-pasting; ideal for team-wide enforcement |
 
 Both modes share the same rules and templates. The pipeline automates the workflow the library supports manually.
 
@@ -126,20 +127,40 @@ graph TD
 
 ## 🚀 Quick Start
 
+### Install
+
+```bash
+git clone https://github.com/gauravs19/archpilot.git
+cd archpilot
+pip install -e .        # installs the `archpilot` CLI globally
+# or without installing: python archpilot.py <command>
+```
+
 ### Pipeline Mode (recommended)
+
 ```bash
 # Initialize a new project
-python archpilot.py init my-project
+archpilot init my-project
 
-# Paste your requirement into my-project/.specs/Input.md
-# Then run all 5 phases
-python archpilot.py run my-project
+# Edit my-project/.specs/Input.md — paste your requirement
+# Then run all 5 phases (requires ANTHROPIC_API_KEY)
+export ANTHROPIC_API_KEY=sk-ant-...
+archpilot run --dir my-project
 
-# Validate all artifacts (tier 3 = strictest)
-python archpilot.py lint --tier 3 --dir my-project
+# Resume from a specific phase (e.g. redo HLD onward without re-running Discovery)
+archpilot run --dir my-project --from-phase 2
 
-# Review a specific artifact
-python archpilot.py review --file my-project/.specs/Design_HLD.md
+# Use a larger model with more output tokens for richer documents
+archpilot run --dir my-project --model claude-opus-4-8 --max-tokens 32000
+
+# Validate all artifacts (tier 2=standard, tier 3=enterprise strictest)
+archpilot lint --dir my-project --tier 2
+
+# Machine-readable lint output for CI tooling
+archpilot lint --dir my-project --tier 2 --format json
+
+# Re-run only the guardrail audit after manual edits
+archpilot review --dir my-project
 ```
 
 **📖 [Full User Guide →](docs/user-guide.md)** | **📂 [DroneOps Example →](examples/droneops-fleet-management/)**
@@ -164,14 +185,69 @@ python archpilot.py review --file my-project/.specs/Design_HLD.md
 1. Copy [`llm-configs/cursor-rules.md`](./llm-configs/cursor-rules.md) to your project as `.cursorrules`
 2. Cursor follows your architecture standards automatically
 
-### Option D: ChatGPT Custom GPT
+### Option D: AWS Kiro
+1. Copy [`llm-configs/kiro-steering-instructions.md`](./llm-configs/kiro-steering-instructions.md) to `.kiro/steering/archpilot-standards.md`
+2. Kiro applies these standards automatically in every agent session
+
+### Option E: ChatGPT Custom GPT
 1. Create a new Custom GPT
-2. Paste [`llm-configs/claude-project-instructions.md`](./llm-configs/claude-project-instructions.md) as system instructions (works for ChatGPT too)
+2. Paste [`llm-configs/chatgpt-custom-gpt.md`](./llm-configs/chatgpt-custom-gpt.md) as system instructions
 3. Upload rule files as knowledge
 
-### Option E: Any LLM (Gemini, Groq, etc.)
-1. Copy the relevant rule file content
-2. Prefix your prompt: *"Follow these standards: [paste rules]. Now create..."*
+### Option F: Google Gemini
+1. Open [Google AI Studio](https://aistudio.google.com) → New Project
+2. Paste [`llm-configs/gemini-instructions.md`](./llm-configs/gemini-instructions.md) as System Instructions
+3. For Vertex AI, pass it as the `system_instruction` field in your API call
+
+### Option G: Windsurf IDE
+1. Copy [`llm-configs/windsurf-rules.md`](./llm-configs/windsurf-rules.md) to your project root as `.windsurfrules`
+2. Windsurf's Cascade agent follows your architecture standards automatically
+
+### Option H: Aider (terminal AI)
+1. Copy [`llm-configs/aider-conventions.md`](./llm-configs/aider-conventions.md) to your project
+2. Reference it in `.aider.conf.yml` with `read: [llm-configs/aider-conventions.md]`
+3. See the file for recommended session commands
+
+### Option I: MCP Server (Claude Code / Claude.ai)
+
+Run Archpilot as a local MCP server so any Claude session can read rules on demand — no copy-pasting required.
+
+```bash
+pip install -e .          # install the mcp dependency
+python mcp_server.py      # starts the MCP server on stdio
+```
+
+**Add to Claude Code** (`~/.claude/settings.json`):
+```json
+{
+  "mcpServers": {
+    "archpilot": {
+      "command": "python",
+      "args": ["/absolute/path/to/archpilot/mcp_server.py"]
+    }
+  }
+}
+```
+
+Once connected, Claude can call:
+- `list_rules()` — discover all 37 rules
+- `get_rule("03-hld-standards")` — fetch a specific rule
+- `run_lint("./my-project")` — lint specs and get JSON results
+- `calculate_nfrs(tps=5000, payload_kb=2, retention_days=90)` — NFR physics
+
+---
+
+## 🎭 Personas
+
+Switch the LLM's expertise and tone with a drop-in persona. Paste into any system prompt:
+
+| Persona | Best for |
+|---------|----------|
+| [`enterprise-architect.md`](./llm-configs/personas/enterprise-architect.md) | Full system design, ARB submissions, greenfield architecture |
+| [`security-architect.md`](./llm-configs/personas/security-architect.md) | Threat modelling, compliance, zero-trust design reviews |
+| [`presales-solutioner.md`](./llm-configs/personas/presales-solutioner.md) | RFP responses, estimation, solution narrative for clients |
+| [`startup-cto.md`](./llm-configs/personas/startup-cto.md) | MVP-first design, pragmatic trade-offs, speed-to-market |
+| [`vibe-code-reviewer.md`](./llm-configs/personas/vibe-code-reviewer.md) | Production readiness review of AI-generated code |
 
 ---
 
@@ -180,8 +256,10 @@ python archpilot.py review --file my-project/.specs/Design_HLD.md
 ```
 archpilot/
 ├── archpilot.py                        # 🚀 CLI entry point (init, run, review, lint)
+├── mcp_server.py                       # 🔌 MCP server — rules, templates, tools over MCP protocol
+├── pyproject.toml                      # 📦 pip install -e . → exposes `archpilot` CLI entry point
 ├── tools/                              # 🛠️ Executable Tools
-│   ├── pipeline.py                     # 5-phase agentic engine (Anthropic SDK)
+│   ├── pipeline.py                     # 5-phase agentic engine (Anthropic SDK, parallel LLDs)
 │   ├── nfr_calculator.py               # Enterprise NFR physics (Little's Law, IOPS, egress)
 │   └── generate_diagrams.py            # Generator for standard Mermaid archetypes
 ├── rules/                              # 🧠 Architecture Standards & Guidelines (50 files)
@@ -270,18 +348,21 @@ archpilot/
 │   ├── data-contract-template.md       # Producer/consumer data contract
 │   └── multi-agent-handoff-template.md # Handoff contract for orchestrator/sub-agents
 │
-├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions
-│   ├── claude-project-instructions.md  # Ready for Claude Projects
+├── llm-configs/                        # 🤖 Platform-Specific LLM Instructions (8 configs)
+│   ├── claude-project-instructions.md  # Claude Projects / Claude.ai
 │   ├── chatgpt-custom-gpt.md           # ChatGPT Custom GPT configuration
 │   ├── vscode-copilot-instructions.md  # GitHub Copilot (.github/copilot-instructions.md)
 │   ├── cursor-rules.md                 # Cursor IDE (.cursorrules)
 │   ├── kiro-steering-instructions.md   # AWS Kiro steering file (.kiro/steering/)
-│   └── personas/
-│       ├── enterprise-architect.md     # Senior architect persona
-│       ├── security-architect.md       # Security architecture reviewer
-│       ├── presales-solutioner.md      # Presales / proposal persona
-│       ├── startup-cto.md             # Startup / MVP-first persona
-│       └── vibe-code-reviewer.md      # Production review of AI-generated code
+│   ├── gemini-instructions.md          # Google Gemini / Vertex AI system instructions
+│   ├── windsurf-rules.md               # Windsurf IDE (.windsurfrules)
+│   ├── aider-conventions.md            # Aider terminal AI (.aider.conf.yml + session guide)
+│   └── personas/                       # 🎭 Drop-in expertise personas
+│       ├── enterprise-architect.md     # Senior architect — full system design
+│       ├── security-architect.md       # Security reviewer — threat modelling, compliance
+│       ├── presales-solutioner.md      # Presales — RFP responses, estimation
+│       ├── startup-cto.md              # Startup CTO — MVP-first, pragmatic trade-offs
+│       └── vibe-code-reviewer.md       # Production readiness review of AI-generated code
 │
 ├── examples/                           # 📄 Sample Outputs & Reference Runs
 │   ├── droneops-fleet-management/      # ⭐ Full pipeline run — 94.1/100 (8 artifacts)
@@ -306,7 +387,7 @@ archpilot/
 └── README.md                           # This file
 ```
 
-**Total: 50 rules | 17 templates | 5 LLM configs | 5-phase agentic pipeline | ~500 KB of enterprise architecture standards**
+**Total: 37 rules | 17 templates | 8 LLM configs | 5 personas | MCP server | 5-phase agentic pipeline | ~500 KB of enterprise architecture standards**
 
 ---
 

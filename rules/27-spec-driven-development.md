@@ -87,6 +87,35 @@ Plus, at the project level:
 constitution.md        ← Immutable project-wide principles (architecture law)
 ```
 
+### 2.5 Artifact Density & Technical Rigor Standards
+
+To prevent "shallow engineering," artifacts MUST meet minimum density thresholds based on the **Rule 37 Triage Matrix**.
+
+#### 2.5.1 requirements.md Standards
+- **Tier 1 (Fast-Track):** Not required.
+- **Tier 2 (Medium):** Minimum 5 EARS requirements. 1 section on "Out of Scope."
+- **Tier 3 (High-Risk):** Minimum 15 EARS requirements. MUST include a **Requirement Traceability Matrix (RTM)** linking requirements to Design (D-XXX) and Tasks (T-XXX).
+
+#### 2.5.2 design.md Standards (The Technical Depth Gate)
+- **Tier 2 (Medium):** Minimum 1 Mermaid Diagram (Sequence or Flow). Minimum 1 Data Schema table.
+- **Tier 3 (High-Risk):** 
+  - **Minimum 2 Mermaid Diagrams** (e.g., Sequence AND Architecture Topology).
+  - **API Contract Table:** MUST specify gRPC/Protobuf or REST endpoints with exact types.
+  - **Data Schema Table:** MUST specify Table/Column names, types, and Primary/Clustering keys.
+  - **Failure Modes Matrix:** MUST analyze at least 3 failure scenarios (e.g., DB Failover, Network Partition).
+
+#### 2.5.3 tasks.md Standards
+- **Tier 2 (Medium):** Every task MUST have Acceptance Criteria.
+- **Tier 3 (High-Risk):** 
+  - Tasks MUST be < 4 hours of effort.
+  - **Verification Section:** Every task MUST specify the exact unit test name or integration test scenario.
+  - **Observability Task:** MUST include at least one task for Metrics/Logging implementation.
+
+#### 2.5.4 Technical Exhaustiveness (The 1000-Line Rule)
+- **Tier 3 (High-Risk):** Artifacts (`requirements.md`, `design.md`, `tasks.md`) MUST NOT be summaries. To ensure Principal-level technical depth, each file MUST exceed **1000 lines** of content.
+- **Why?** If a design for a global HFT bridge is under 1000 lines, it has likely skipped Protobuf definitions, failure-state logic, and observability hook details. 
+- **Non-Negotiable:** The `archpilot.py` linter will fail if line counts are insufficient.
+
 ### 2.1 requirements.md — The "What"
 
 **Purpose:** Capture business intent, user needs, and system behaviors in machine-readable EARS format.

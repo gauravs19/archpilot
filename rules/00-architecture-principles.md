@@ -28,6 +28,13 @@
 
 ---
 
+### 1.5 Quantification over Qualities (Hard Physics)
+- **The Rule:** Adjectives are not architecture. You MUST NOT use vague descriptors like "fast," "scalable," "resilient," "secure," or "efficient" in any specification.
+- **The Enforcement:** Every claim of a quality MUST be replaced by a quantified NFR.
+  - WRONG: "The system should be fast."
+  - RIGHT: "The system MUST maintain sub-100ms P99 latency at 10,000 TPS."
+- **One-Way Door Decisions:** Every "One-Way Door" decision MUST be backed by an ADR (Rule 02) containing a comparative weighted matrix.
+
 ## 1. Design Principles
 
 ### 1.1 Separation of Concerns (SoC) & Topological Isolation
