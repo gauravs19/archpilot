@@ -11,10 +11,10 @@
 
 | Standard | Relationship |
 |----------|-------------|
-| [27 — Spec-Driven Development](./27-spec-driven-development.md) | Specs constrain agent behavior |
-| [28 — Context Engineering](./28-context-engineering.md) | Context design for agent isolation |
-| [07 — Security Architecture](./07-security-architecture.md) | Security controls for agents |
-| [18 — Architecture Governance](./18-architecture-governance.md) | Broader governance framework |
+| [27 - Spec-Driven Development](./27-spec-driven-development.md) | Specs constrain agent behavior |
+| [28 - Context Engineering](./28-context-engineering.md) | Context design for agent isolation |
+| [07 - Security Architecture](./07-security-architecture.md) | Security controls for agents |
+| [18 - Architecture Governance](./18-architecture-governance.md) | Broader governance framework |
 
 ---
 
@@ -63,7 +63,7 @@ Every agent deployment MUST enforce:
 
 - [ ] **Scope boundary:** Agent can ONLY access files/APIs listed in its task context
 - [ ] **No-write zones:** Define protected paths/resources agents cannot modify (e.g., `/.env`, migration files, production configs)
-- [ ] **Command allowlist:** Shell/CLI commands available to agents are explicitly allowlisted — deny by default
+- [ ] **Command allowlist:** Shell/CLI commands available to agents are explicitly allowlisted ï¿½ deny by default
 - [ ] **External network isolation:** Agents in dev/test MUST NOT call production APIs
 - [ ] **Secret protection:** Agents MUST NOT log, print, or include secrets in any artifact
 - [ ] **Cost guardrails:** Max spend per agent run defined and enforced via budget alerts
@@ -84,7 +84,7 @@ Define checkpoints where human review is mandatory:
 
 ### 3.3 Blast Radius Minimization
 
-- Agents MUST operate on feature branches — never directly on `main` or `release`
+- Agents MUST operate on feature branches ï¿½ never directly on `main` or `release`
 - Each agent task MUST be scoped to the minimum set of files required
 - Destructive operations (deletes, truncates, revokes) MUST require explicit human confirmation
 - Agent changes MUST be reversible: no irreversible action without a documented rollback
@@ -147,7 +147,7 @@ Human (highest trust)
 ```
 
 **Rule:** Sub-agents cannot elevate their own trust level.
-**Rule:** Sub-agents cannot directly communicate with each other — all routing goes through orchestrator.
+**Rule:** Sub-agents cannot directly communicate with each other ï¿½ all routing goes through orchestrator.
 **Rule:** Orchestrator cannot execute code directly; it delegates to specialist agents.
 
 ### 5.3 Agent Failure Handling
@@ -204,5 +204,5 @@ Before merging any agent-generated artifact:
 
 ---
 
-*Archpilot — Enterprise Architecture Standards Library*
+*Archpilot ï¿½ Enterprise Architecture Standards Library*
 *Created by Gaurav Sharma*
