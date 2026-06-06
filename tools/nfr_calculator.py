@@ -3,7 +3,7 @@ import math
 
 def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print("=" * 70)
-    print(" 🚀 ARCHPILOT ENTERPRISE NFR CALCULATOR (50+ METRICS)")
+    print(" ARCHPILOT ENTERPRISE NFR CALCULATOR (50+ METRICS)")
     print("=" * 70)
     
     # Pre-computations
@@ -21,7 +21,7 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     tb_per_year = tb_per_month * 12
     
     # 1. AVAILABILITY & RELIABILITY (10 Metrics)
-    print("\n🛡️  1. AVAILABILITY & RELIABILITY")
+    print("\n1. AVAILABILITY & RELIABILITY")
     uptime_year_mins = 365 * 24 * 60
     downtime_allowed_mins = uptime_year_mins * (1.0 - (sla / 100.0))
     downtime_allowed_month = downtime_allowed_mins / 12
@@ -37,7 +37,7 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print(f" [10] Chaos Engineering:        Fault injection required for {sla}% SLA validation")
 
     # 2. PERFORMANCE & LATENCY (10 Metrics)
-    print("\n⚡ 2. PERFORMANCE & LATENCY")
+    print("\n2. PERFORMANCE & LATENCY")
     processing_sec = latency_ms / 1000.0
     print(f" [11] Target P99 Latency:       {latency_ms} ms")
     print(f" [12] Target P95 Latency:       {latency_ms * 0.75:.0f} ms")
@@ -51,7 +51,7 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print(f" [20] DB Connection Pool Size:  {math.ceil((write_tps * processing_sec) * 1.5)} active connections")
 
     # 3. COMPUTE & SCALABILITY (10 Metrics)
-    print("\n⚙️  3. COMPUTE & CONCURRENCY (Little's Law)")
+    print("\n3. COMPUTE & CONCURRENCY (Little's Law)")
     concurrency = tps * processing_sec
     threads_per_pod = 200
     pods = math.ceil(concurrency / threads_per_pod)
@@ -67,7 +67,7 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print(f" [30] Rate Limiting Target:     {math.ceil(tps / 100)} req/sec per user IP")
 
     # 4. STORAGE & DATA (10 Metrics)
-    print("\n💾 4. STORAGE & DATA RETENTION")
+    print("\n4. STORAGE & DATA RETENTION")
     daily_storage_gb = gb_per_day * write_ratio
     total_retention_gb = daily_storage_gb * retention_days
     index_overhead_gb = total_retention_gb * 0.4
@@ -84,7 +84,7 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print(f" [40] Cold Storage Archive:     {daily_storage_gb * 365 / 1024:.2f} TB/year to S3/Glacier")
 
     # 5. NETWORK & COST (10 Metrics)
-    print("\n🌐 5. NETWORK & COST TOPOLOGY")
+    print("\n5. NETWORK & COST TOPOLOGY")
     print(f" [41] Ingress Bandwidth:        {mb_per_sec * write_ratio:.2f} MB/sec")
     print(f" [42] Egress Bandwidth:         {mb_per_sec * read_ratio:.2f} MB/sec")
     print(f" [43] Monthly Egress Data:      {tb_per_month:.2f} TB/month")
@@ -99,7 +99,7 @@ def calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio):
     print(f" [50] VPC Subnet Sizing:        /24 per AZ minimum (254 IPs)")
 
     # 6. STATISTICAL VARIANCE & BURST WARNINGS
-    print("\n⚠️  6. VARIANCE & NON-LINEAR SCALING WARNINGS")
+    print("\n6. VARIANCE & NON-LINEAR SCALING WARNINGS")
     print(" [!] Little's Law assumes uniform traffic distribution. It does not account for GC pauses or lock contention.")
     print(" [!] Always provision a 20% 'Burst Buffer' above the calculated maximums for CPU/Memory.")
     print(" [!] Database IOPS calculations assume linear write latency. Watch for index-bloat degradation.")

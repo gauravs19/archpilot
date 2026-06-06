@@ -2,3 +2,4 @@
 # Install with: pip install -r requirements.txt
 
 anthropic>=0.40.0
+mcp>=1.0.0

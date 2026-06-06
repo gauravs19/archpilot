@@ -9,7 +9,7 @@ description = "Enterprise Architecture as Code — 5-phase agentic pipeline and 
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
-dependencies = ["anthropic>=0.40.0"]
+dependencies = ["anthropic>=0.40.0", "mcp>=1.0.0"]
 
 [project.urls]
 Homepage = "https://gauravs19.github.io/archpilot"

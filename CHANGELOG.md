@@ -8,11 +8,44 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Phase 7 (Planned)
 ### Planned
-- `archpilot-reviewer` GitHub Action for automated PR auditing
 - Drift Detection script comparing implementation vs `design.md`
-- MCP Server packaging all rules for direct LLM integration
 - Fitness Function runner (ArchUnit/Spectral CI gating)
 - ADR DAG Visualizer for living decision graph
+
+---
+
+## [4.1.0] — 2026-06-07 — Pipeline Hardening, MCP Server, 3 New LLM Configs
+
+### Added
+- **MCP Server (`mcp_server.py`):** Exposes all 37 rules, 17 templates, and 5 personas as MCP resources (`archpilot://rules/{name}`, `archpilot://templates/{name}`, `archpilot://personas/{name}`). Tools: `list_rules()`, `get_rule()`, `list_templates()`, `list_personas()`, `run_lint()`, `calculate_nfrs()`. Add to Claude Code or Claude.ai with a single JSON config entry.
+- **`pyproject.toml`:** `pip install -e .` now works; exposes `archpilot` as a proper CLI entry point — no more `cd` to repo root.
+- **`llm-configs/gemini-instructions.md`:** System instructions for Google AI Studio, Vertex AI, and Gemini in Google Workspace.
+- **`llm-configs/windsurf-rules.md`:** `.windsurfrules` for Windsurf (Codeium) IDE including Cascade-specific workflow guidance.
+- **`llm-configs/aider-conventions.md`:** Recommended `.aider.conf.yml`, Python/TS conventions, and step-by-step Archpilot workflow for Aider terminal AI.
+- **`.github/workflows/archpilot-lint.yml`:** Real GitHub Actions CI workflow that runs `archpilot lint --tier 2` on PRs touching `.specs/` or `rules/` (replaces the broken `workflows/archpilot-review.yml`).
+- **`.gitignore`:** Covers `.specs/` (generated client docs), Python cache, venv, OS artefacts.
+
+### Changed
+- **Pipeline — Parallel LLD generation:** Phase 3 now uses `ThreadPoolExecutor` (max 4 workers). LLDs are independent — 3-5 services now generate concurrently, ~4× faster wall-clock.
+- **Pipeline — Retry logic:** Exponential backoff on `RateLimitError` and HTTP 5xx errors (3 attempts). Pipeline no longer crashes on transient API issues.
+- **Pipeline — Context budget doubled:** `cap()` limits raised across all phases (discovery 4k→8k, requirements 6k→12k, HLD 4k→8k, review artifacts 3k→6k). Claude sees significantly more of each artifact.
+- **Pipeline — `max_tokens` default 8000→16000:** All phases produce materially more complete documents.
+- **CLI — `--from-phase N`:** Resume `archpilot run` from any phase (0–4). Reads existing `.specs/` artifacts for earlier phases — saves re-burning tokens when iterating.
+- **CLI — `--max-tokens`:** Override output token limit per Claude call from the command line.
+- **CLI — `--format json` on `lint`:** Machine-readable `{"errors": [...], "warnings": [...]}` output for CI tooling.
+- **CLI — `--version`:** `archpilot --version` now prints `archpilot 4.1.0`.
+- **Lint tier fix:** Weak-word violations (`fast`, `scalable`, etc.) are `[WARN]` at Tier 1, `[ERROR]` at Tier 2+ (was always ERROR regardless of tier).
+- **Lint false-positive fix:** Fenced code blocks are stripped before weak-word scanning — no more false positives on `fast` inside a Dockerfile or code example.
+- **`init` message:** Uses `sys.argv[0]` instead of hardcoded `"python archpilot.py"`.
+- **`requirements.txt`:** Added `mcp>=1.0.0`.
+
+### Fixed
+- **`tools/generate_diagrams.py`:** Hardcoded absolute Windows path (`d:\_elfor\...`) replaced with `Path(__file__)`-relative path — any contributor can now run this tool without editing source.
+- **`rules/29-agentic-ai-governance.md`:** Repaired UTF-8 mojibake on related-standards table (rendered as broken boxes on GitHub).
+
+### Removed
+- **`workflows/archpilot-review.yml`:** Deleted — was in wrong directory (never ran), referenced non-existent published Action, used wrong API key. Superseded by `.github/workflows/archpilot-lint.yml`.
+- **`dashboard/`:** Removed abandoned `dashboard/index.html` + `dashboard/style.css`. Production site is `docs/index.html`.
 
 ---
 
