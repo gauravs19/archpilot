@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: archpilot-lint
+        name: Archpilot Spec Lint
+        entry: python archpilot.py lint --dir . --tier 2
+        language: python
+        files: \.specs/.*\.md$
+        pass_filenames: false
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^(archpilot|mcp_server|tools/pipeline|tools/nfr_calculator|tools/generate_diagrams)\.py$
