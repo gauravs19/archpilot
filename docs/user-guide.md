@@ -299,6 +299,100 @@ Persona files live in `llm-configs/personas/`. You can edit them or add custom p
 
 ---
 
+## Pushing to Jira / Azure DevOps
+
+After the pipeline runs, push all generated Epics and User Stories directly to your issue tracker — no copy-paste.
+
+```bash
+# Push to Jira
+archpilot push --target jira --dir my-project
+
+# Push to Azure DevOps
+archpilot push --target ado --dir my-project
+
+# Preview without making any API calls
+archpilot push --target jira --dir my-project --dry-run
+
+# Create Epics only (check hierarchy before committing stories)
+archpilot push --target jira --dir my-project --epics-only
+```
+
+### Configuration — env file (recommended)
+
+Instead of exporting environment variables every session, create a `.archpilot.env` file in your project root (it is gitignored automatically):
+
+```bash
+cp .archpilot.env.example .archpilot.env
+# then edit .archpilot.env with your credentials
+```
+
+```ini
+# .archpilot.env  — never commit this file
+JIRA_URL=https://yourorg.atlassian.net
+JIRA_EMAIL=you@yourorg.com
+JIRA_API_TOKEN=your_token_here
+JIRA_PROJECT_KEY=ARCH
+
+ADO_ORG=myorg
+ADO_PROJECT=ArchProject
+ADO_PAT=your_pat_here
+
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Search order: `<project>/.archpilot.env` → `<project>/archpilot.env` → `~/.archpilot.env`. Environment variables already set in the shell always take priority over file values.
+
+### Jira setup
+
+```bash
+# Option A: config file (recommended)
+cp .archpilot.env.example .archpilot.env  # fill in JIRA_* keys
+archpilot push --target jira --dir my-project
+
+# Option B: shell env vars
+export JIRA_URL="https://yourorg.atlassian.net"
+export JIRA_EMAIL="you@yourorg.com"
+export JIRA_API_TOKEN="<token from id.atlassian.com → Security → API tokens>"
+export JIRA_PROJECT_KEY="ARCH"
+archpilot push --target jira --dir my-project
+```
+
+What gets created per Epic: **Epic** issue with category label, business value in description, and Definition of Done bullet list.
+
+What gets created per Story: **Story** issue linked to its parent Epic, with the full `As a / I want / So that` narrative, EARS acceptance criteria as a numbered list, story points, MoSCoW priority, and NFR tags as labels.
+
+### Azure DevOps setup
+
+```bash
+export ADO_ORG="myorg"
+export ADO_PROJECT="ArchProject"
+export ADO_PAT="<Personal Access Token — Work Items: Read & Write>"
+
+archpilot push --target ado --dir my-project
+```
+
+ADO work item types: **Epic** (for epics) and **User Story** (for stories) with a parent-child hierarchy link. Acceptance criteria map to the ADO `Microsoft.VSTS.Common.AcceptanceCriteria` field. Story points map to `Microsoft.VSTS.Scheduling.StoryPoints`.
+
+### Idempotency
+
+A `.specs/push_manifest.json` file tracks every pushed ID. Re-running `archpilot push` skips already-pushed items — safe to run after adding new epics to `requirements.md`.
+
+```json
+{
+  "target": "jira",
+  "project": "ARCH",
+  "pushed_at": "2026-06-07T10:00:00+00:00",
+  "epics": {
+    "EP-01": {"key": "ARCH-1", "url": "https://yourorg.atlassian.net/browse/ARCH-1"}
+  },
+  "stories": {
+    "EP-01-S-01": {"key": "ARCH-13", "url": "..."}
+  }
+}
+```
+
+---
+
 ## MCP Server
 
 Archpilot ships an [MCP](https://modelcontextprotocol.io) server (`mcp_server.py`) that exposes the entire standards library — rules, templates, personas, diagrams — as resources and tools. Any MCP-compatible client (Claude Code, Claude Desktop, Cursor) can read rules on demand without copy-pasting files.

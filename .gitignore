@@ -11,6 +11,10 @@ build/
 venv/
 .env
 
+# Archpilot credentials — never commit
+.archpilot.env
+archpilot.env
+
 # OS
 .DS_Store
 Thumbs.db

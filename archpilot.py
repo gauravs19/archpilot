@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Archpilot CLI v4.2
+Archpilot CLI v4.3
 Commands:
   init    — scaffold .specs/ directory structure
   lint    — validate .specs/ against enterprise standards (tiers 1-3)
   run     — execute the full 5-stage agentic pipeline (requires ANTHROPIC_API_KEY)
   review  — re-run guardrail audit on existing .specs/ artifacts
   drift   — detect drift between LLD API specs and actual source code
+  push    — push epics and stories from requirements.md to Jira or Azure DevOps
 """
 
 import os
@@ -15,7 +16,7 @@ import re
 import json
 import argparse
 
-__version__ = "4.2.0"
+__version__ = "4.3.0"
 
 
 # ─── INIT ────────────────────────────────────────────────────────────────────
@@ -272,6 +273,19 @@ def drift_cmd(target_dir: str, src_dir: str | None, fmt: str) -> None:
     drift_check(target_dir, src_dir, fmt)
 
 
+def push_cmd(target_dir: str, target: str, dry_run: bool, epics_only: bool) -> None:
+    """Push requirements.md epics/stories to Jira or Azure DevOps."""
+    _ensure_tools()
+    from tools.push_tracker import push
+    push(target_dir, target, dry_run, epics_only)
+
+
+def _ensure_tools() -> None:
+    root = os.path.dirname(os.path.abspath(__file__))
+    if root not in sys.path:
+        sys.path.insert(0, root)
+
+
 def review_cmd(target_dir: str, model: str, max_tokens: int) -> None:
     """Re-run the guardrail review against existing .specs/ artifacts."""
     _ensure_pipeline()
@@ -375,6 +389,32 @@ def main() -> None:
         help="Max output tokens per Claude call (default: 16000)"
     )
 
+    # push
+    p_push = subparsers.add_parser(
+        "push",
+        help="Push epics and stories from requirements.md to Jira or Azure DevOps",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "Push generated requirements to your issue tracker.\n\n"
+            "Jira env vars : JIRA_URL  JIRA_EMAIL  JIRA_API_TOKEN  JIRA_PROJECT_KEY\n"
+            "ADO env vars  : ADO_ORG   ADO_PROJECT  ADO_PAT\n\n"
+            "A .specs/push_manifest.json file tracks pushed IDs — re-running is safe."
+        ),
+    )
+    p_push.add_argument(
+        "--target", required=True, choices=["jira", "ado"],
+        help="Issue tracker to push to: jira or ado (Azure DevOps)"
+    )
+    p_push.add_argument("--dir", default=".", help="Project root directory (default: current)")
+    p_push.add_argument(
+        "--dry-run", action="store_true",
+        help="Preview what would be created without making any API calls"
+    )
+    p_push.add_argument(
+        "--epics-only", action="store_true",
+        help="Create Epics only — skip User Stories (useful for initial setup)"
+    )
+
     args = parser.parse_args()
 
     if args.command == "init":
@@ -390,6 +430,8 @@ def main() -> None:
         review_cmd(args.dir, args.model, args.max_tokens)
     elif args.command == "drift":
         drift_cmd(args.dir, args.src, args.fmt)
+    elif args.command == "push":
+        push_cmd(args.dir, args.target, args.dry_run, args.epics_only)
     else:
         parser.print_help()
 
