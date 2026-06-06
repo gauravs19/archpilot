@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Archpilot Agentic Pipeline Engine v4.0
+Archpilot Agentic Pipeline Engine v4.1
 Orchestrates the 5-stage pipeline:
   Phase 0: SE Agent     — Deep Discovery (15 dimensions)
   Phase 1: PO Agent     — Requirements Breakdown (Epics / Stories / Tasks)
   Phase 2: Arch Agent   — High-Level Design (HLD)
-  Phase 3: Arch Agent   — Low-Level Design(s) (LLD per service)
+  Phase 3: Arch Agent   — Low-Level Design(s) (LLD per service, parallel)
   Phase 4: Review Agent — Guardrail Audit & Compliance Scorecard
 """
 
@@ -13,8 +13,10 @@ import os
 import sys
 import re
 import json
+import time
 from pathlib import Path
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     import anthropic
@@ -71,27 +73,43 @@ def cap(text: str, chars: int) -> str:
     return text[:chars] + "\n...[truncated for context]" if len(text) > chars else text
 
 
-# ─── Claude caller (streaming) ────────────────────────────────────────────────
+# ─── Claude caller (streaming) with retry ─────────────────────────────────────
 def call_claude(
     client: anthropic.Anthropic,
     system_prompt: str,
     user_message: str,
     model: str = "claude-sonnet-4-6",
-    max_tokens: int = 8000,
+    max_tokens: int = 16000,
+    max_retries: int = 3,
 ) -> str:
-    full = []
-    print(f"  {DIM}", end="", flush=True)
-    with client.messages.stream(
-        model=model,
-        max_tokens=max_tokens,
-        system=system_prompt,
-        messages=[{"role": "user", "content": user_message}],
-    ) as stream:
-        for chunk in stream.text_stream:
-            print(chunk, end="", flush=True)
-            full.append(chunk)
-    print(f"{RESET}")
-    return "".join(full)
+    for attempt in range(max_retries):
+        try:
+            full = []
+            print(f"  {DIM}", end="", flush=True)
+            with client.messages.stream(
+                model=model,
+                max_tokens=max_tokens,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_message}],
+            ) as stream:
+                for chunk in stream.text_stream:
+                    print(chunk, end="", flush=True)
+                    full.append(chunk)
+            print(f"{RESET}")
+            return "".join(full)
+        except anthropic.RateLimitError:
+            wait = (2 ** attempt) * 10
+            warn(f"Rate limit hit (attempt {attempt + 1}/{max_retries}). Retrying in {wait}s...")
+            time.sleep(wait)
+        except anthropic.APIStatusError as e:
+            if e.status_code in (529, 503, 502) and attempt < max_retries - 1:
+                wait = (2 ** attempt) * 5
+                warn(f"API error {e.status_code} (attempt {attempt + 1}/{max_retries}). Retrying in {wait}s...")
+                time.sleep(wait)
+            else:
+                err(f"API error {e.status_code}: {e.message}")
+                raise
+    raise RuntimeError(f"Claude API failed after {max_retries} attempts.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -145,7 +163,7 @@ OUTPUT RULES
 - Finish with "## Interrogation List" — the exact questions the client must answer before Phase 1.
 """
 
-def run_discovery(client, specs_dir: Path, input_req: str) -> str:
+def run_discovery(client, specs_dir: Path, input_req: str, model: str, max_tokens: int) -> str:
     banner(0, "SE Agent — Deep Discovery (15 Dimensions)")
     info("Analysing requirement across all 15 mandatory dimensions...")
 
@@ -157,14 +175,14 @@ DISCOVERY TEMPLATE (fill every section — replace all placeholders):
 {tmpl("discovery-template.md")}
 
 RULE 36 — Discovery & Ambiguity Standards:
-{cap(rule("36-discovery-ambiguity.md"), 2500)}
+{cap(rule("36-discovery-ambiguity.md"), 4000)}
 
 RULE 50 — Pipeline Governance Constraints:
-{cap(rule("50-agent-pipeline.md"), 1500)}
+{cap(rule("50-agent-pipeline.md"), 2500)}
 
 Produce the complete discovery.md. Minimum 15 dimensions. No placeholders. No TODOs.
 """
-    result = call_claude(client, _DISCOVERY_SYSTEM, user_msg)
+    result = call_claude(client, _DISCOVERY_SYSTEM, user_msg, model, max_tokens)
     write_artifact(specs_dir, "discovery.md", result)
     return result
 
@@ -212,26 +230,26 @@ QUALITY GATES
 - Every story must link back to a discovery dimension via a [DIM-XX] tag.
 """
 
-def run_requirements(client, specs_dir: Path, discovery_content: str) -> str:
+def run_requirements(client, specs_dir: Path, discovery_content: str, model: str, max_tokens: int) -> str:
     banner(1, "PO Agent — Requirements Breakdown")
     info("Generating categorized multi-level requirements (10-20 Epics, 50-150 Stories)...")
 
     user_msg = f"""\
 DISCOVERY DOCUMENT:
-{cap(discovery_content, 6000)}
+{cap(discovery_content, 12000)}
 
 REQUIREMENTS BREAKDOWN TEMPLATE (populate fully):
 {tmpl("requirements-breakdown-template.md")}
 
 RULE 27 — Spec-Driven Development:
-{cap(rule("27-spec-driven-development.md"), 2000)}
+{cap(rule("27-spec-driven-development.md"), 3000)}
 
 RULE 50 — Pipeline Constraints:
-{cap(rule("50-agent-pipeline.md"), 1000)}
+{cap(rule("50-agent-pipeline.md"), 1500)}
 
 Generate requirements.md. 10-20 Epics. 50-150 Stories. Every story fully populated. No placeholders.
 """
-    result = call_claude(client, _REQUIREMENTS_SYSTEM, user_msg, max_tokens=8000)
+    result = call_claude(client, _REQUIREMENTS_SYSTEM, user_msg, model, max_tokens)
     write_artifact(specs_dir, "requirements.md", result)
     return result
 
@@ -274,42 +292,42 @@ ARCHITECTURE STANDARDS
 - Call out anti-patterns explicitly where they were avoided and why.
 """
 
-def run_hld(client, specs_dir: Path, discovery_content: str, requirements_content: str) -> str:
+def run_hld(client, specs_dir: Path, discovery_content: str, requirements_content: str, model: str, max_tokens: int) -> str:
     banner(2, "Arch Agent — High-Level Design")
     info("Generating HLD (14 sections, C4 diagrams, NFRs, cost estimate)...")
 
     user_msg = f"""\
 DISCOVERY DOCUMENT:
-{cap(discovery_content, 4000)}
+{cap(discovery_content, 8000)}
 
 REQUIREMENTS (key epics and NFRs):
-{cap(requirements_content, 3000)}
+{cap(requirements_content, 6000)}
 
 HLD TEMPLATE (populate all 14 sections):
 {tmpl("hld-template.md")}
 
 RULE 03 — HLD Standards:
-{cap(rule("03-hld-standards.md"), 2000)}
+{cap(rule("03-hld-standards.md"), 3000)}
 
 RULE 07 — Security Architecture:
-{cap(rule("07-security-architecture.md"), 1500)}
+{cap(rule("07-security-architecture.md"), 2000)}
 
 RULE 08 — Cloud Architecture:
-{cap(rule("08-cloud-architecture.md"), 1500)}
+{cap(rule("08-cloud-architecture.md"), 2000)}
 
 RULE 09 — Microservices Patterns:
-{cap(rule("09-microservices-patterns.md"), 1000)}
+{cap(rule("09-microservices-patterns.md"), 1500)}
 
 Produce the complete Design_HLD.md. All 14 sections mandatory. Mermaid diagrams must be syntactically valid.
 Include real technology choices with rationale. No placeholders.
 """
-    result = call_claude(client, _HLD_SYSTEM, user_msg, max_tokens=8000)
+    result = call_claude(client, _HLD_SYSTEM, user_msg, model, max_tokens)
     write_artifact(specs_dir, "Design_HLD.md", result)
     return result
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PHASE 3 — ARCH AGENT: LOW-LEVEL DESIGN(S)
+# PHASE 3 — ARCH AGENT: LOW-LEVEL DESIGN(S) — parallel execution
 # ═══════════════════════════════════════════════════════════════════════════════
 
 _LLD_SYSTEM = """\
@@ -344,7 +362,7 @@ QUALITY STANDARDS
 - Cache TTLs, pool sizes, retry counts must be explicit numbers — not "TBD".
 """
 
-def _extract_services(client, hld_content: str) -> list[str]:
+def _extract_services(client, hld_content: str, model: str) -> list:
     """Ask Claude to extract the top 3-5 service names from the HLD container diagram."""
     info("Extracting services from HLD container diagram...")
     raw = call_claude(
@@ -352,8 +370,9 @@ def _extract_services(client, hld_content: str) -> list[str]:
         "You extract service names from HLD documents. Return ONLY a valid JSON array of strings. No prose.",
         f"From this HLD, list the top 3-5 services that need individual LLD documents.\n"
         f"Return ONLY a JSON array, e.g.: [\"Payment Service\", \"User Service\"]\n\n"
-        f"HLD (containers section):\n{cap(hld_content, 3000)}",
-        max_tokens=300,
+        f"HLD (containers section):\n{cap(hld_content, 5000)}",
+        model=model,
+        max_tokens=400,
     )
     try:
         match = re.search(r'\[.*?\]', raw, re.DOTALL)
@@ -361,39 +380,25 @@ def _extract_services(client, hld_content: str) -> list[str]:
     except Exception:
         return ["Core Service", "API Service", "Data Service"]
 
-def run_lld(
-    client,
-    specs_dir: Path,
-    hld_content: str,
-    requirements_content: str,
-    discovery_content: str,
-) -> dict[str, str]:
-    banner(3, "Arch Agent — Low-Level Designs")
-
-    services = _extract_services(client, hld_content)
-    info(f"Generating LLDs for {len(services)} services: {', '.join(services)}")
-
-    lld_results: dict[str, str] = {}
-    lld_template = tmpl("lld-template.md")
-    r04 = cap(rule("04-lld-standards.md"), 2000)
-    r05 = cap(rule("05-api-design.md"),     1500)
-    r06 = cap(rule("06-data-architecture.md"), 1500)
-
-    for svc in services:
-        info(f"LLD → {svc}")
-        safe = re.sub(r'[^A-Za-z0-9_]', '_', svc)
-
-        user_msg = f"""\
+def _generate_single_lld(
+    client, specs_dir: Path, svc: str,
+    hld_content: str, requirements_content: str, discovery_content: str,
+    lld_template: str, r04: str, r05: str, r06: str,
+    model: str, max_tokens: int,
+) -> tuple:
+    """Generate a single LLD document. Runs in a thread."""
+    safe = re.sub(r'[^A-Za-z0-9_]', '_', svc)
+    user_msg = f"""\
 SERVICE: {svc}
 
 HLD DOCUMENT:
-{cap(hld_content, 3000)}
+{cap(hld_content, 6000)}
 
 DISCOVERY CONTEXT (key constraints for this service):
-{cap(discovery_content, 2000)}
+{cap(discovery_content, 4000)}
 
 RELEVANT REQUIREMENTS:
-{cap(requirements_content, 2000)}
+{cap(requirements_content, 4000)}
 
 LLD TEMPLATE (populate all 12 sections):
 {lld_template}
@@ -411,10 +416,50 @@ Produce the complete LLD for "{svc}". All 12 sections mandatory.
 Include sequence diagrams, DB schema with indexes, API specs with examples.
 All numeric thresholds explicit (no TBD). No placeholders.
 """
-        result = call_claude(client, _LLD_SYSTEM, user_msg, max_tokens=8000)
-        fname = f"Design_LLD_{safe}.md"
-        write_artifact(specs_dir, fname, result)
-        lld_results[svc] = result
+    result = call_claude(client, _LLD_SYSTEM, user_msg, model, max_tokens)
+    fname = f"Design_LLD_{safe}.md"
+    write_artifact(specs_dir, fname, result)
+    return svc, result
+
+def run_lld(
+    client,
+    specs_dir: Path,
+    hld_content: str,
+    requirements_content: str,
+    discovery_content: str,
+    model: str,
+    max_tokens: int,
+) -> dict:
+    banner(3, "Arch Agent — Low-Level Designs (parallel)")
+
+    services = _extract_services(client, hld_content, model)
+    info(f"Generating LLDs for {len(services)} services in parallel: {', '.join(services)}")
+
+    lld_template = tmpl("lld-template.md")
+    r04 = cap(rule("04-lld-standards.md"), 3000)
+    r05 = cap(rule("05-api-design.md"),     2500)
+    r06 = cap(rule("06-data-architecture.md"), 2500)
+
+    lld_results: dict = {}
+    # LLDs are independent — generate them concurrently
+    with ThreadPoolExecutor(max_workers=min(len(services), 4)) as executor:
+        futures = {
+            executor.submit(
+                _generate_single_lld,
+                client, specs_dir, svc,
+                hld_content, requirements_content, discovery_content,
+                lld_template, r04, r05, r06,
+                model, max_tokens,
+            ): svc
+            for svc in services
+        }
+        for future in as_completed(futures):
+            try:
+                svc, result = future.result()
+                lld_results[svc] = result
+            except Exception as e:
+                svc = futures[future]
+                err(f"LLD generation failed for '{svc}': {e}")
 
     return lld_results
 
@@ -477,43 +522,45 @@ def run_review(
     discovery: str,
     requirements: str,
     hld: str,
-    lld_results: dict[str, str],
+    lld_results: dict,
+    model: str,
+    max_tokens: int,
 ) -> str:
     banner(4, "Review Agent — Guardrail Audit & Compliance Scorecard")
     info("Auditing all artifacts across 12 guardrail dimensions...")
 
     lld_summary = "\n\n".join(
-        f"### LLD: {svc}\n{cap(content, 1200)}" for svc, content in lld_results.items()
+        f"### LLD: {svc}\n{cap(content, 2500)}" for svc, content in lld_results.items()
     )
 
     user_msg = f"""\
 ARTIFACT: discovery.md (Phase 0)
-{cap(discovery, 3000)}
+{cap(discovery, 6000)}
 
 ARTIFACT: requirements.md (Phase 1)
-{cap(requirements, 3000)}
+{cap(requirements, 6000)}
 
 ARTIFACT: Design_HLD.md (Phase 2)
-{cap(hld, 3000)}
+{cap(hld, 6000)}
 
 ARTIFACT: LLD Documents (Phase 3)
 {lld_summary}
 
 GUARDRAIL STANDARDS:
 Rule 00 — Architecture Principles:
-{cap(rule("00-architecture-principles.md"), 1500)}
+{cap(rule("00-architecture-principles.md"), 2500)}
 
 Rule 07 — Security Architecture:
-{cap(rule("07-security-architecture.md"), 1500)}
+{cap(rule("07-security-architecture.md"), 2000)}
 
 Rule 11 — NFR Checklist (69 checks):
-{cap(rule("11-nfr-checklist.md"), 1500)}
+{cap(rule("11-nfr-checklist.md"), 2000)}
 
 Rule 29 — Agentic AI Governance:
-{cap(rule("29-agentic-ai-governance.md"), 1000)}
+{cap(rule("29-agentic-ai-governance.md"), 1500)}
 
 Rule 50 — Pipeline Governance:
-{cap(rule("50-agent-pipeline.md"), 800)}
+{cap(rule("50-agent-pipeline.md"), 1200)}
 
 Produce the complete review_report.md.
 - Score every dimension 0-10.
@@ -521,7 +568,7 @@ Produce the complete review_report.md.
 - Every finding must cite: artifact name, section heading, and specific line/claim.
 - Recommended fixes must be actionable (not generic advice).
 """
-    result = call_claude(client, _REVIEW_SYSTEM, user_msg, max_tokens=8000)
+    result = call_claude(client, _REVIEW_SYSTEM, user_msg, model, max_tokens)
     write_artifact(specs_dir, "review_report.md", result)
     return result
 
@@ -530,10 +577,20 @@ Produce the complete review_report.md.
 # MAIN PIPELINE RUNNER
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def run_pipeline(specs_dir_base: str, model: str = "claude-sonnet-4-6") -> None:
+def run_pipeline(
+    specs_dir_base: str,
+    model: str = "claude-sonnet-4-6",
+    from_phase: int = 0,
+    max_tokens: int = 16000,
+) -> None:
     """
     Execute the full 5-stage Archpilot agentic pipeline.
-    Reads .specs/Input.md, writes all artifacts into .specs/.
+
+    Args:
+        specs_dir_base: directory containing .specs/
+        model:          Claude model ID
+        from_phase:     resume from this phase (0-4); reads existing artifacts for earlier phases
+        max_tokens:     maximum output tokens per Claude call
     """
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -552,27 +609,58 @@ def run_pipeline(specs_dir_base: str, model: str = "claude-sonnet-4-6") -> None:
         err("'.specs/Input.md' not found. Add your high-level requirement there.")
         sys.exit(1)
 
-    input_req = read_file(input_file)
+    input_req = (specs_dir / "Input.md").read_text(encoding="utf-8")
     if len(input_req.strip()) < 50:
         err("Input.md is too short. Provide a meaningful high-level requirement (min 50 chars).")
         sys.exit(1)
 
     bar = "═" * 62
     print(f"\n{BOLD}{GREEN}{bar}{RESET}")
-    print(f"{BOLD}{GREEN}  Archpilot Agentic Pipeline v4.0{RESET}")
+    print(f"{BOLD}{GREEN}  Archpilot Agentic Pipeline v4.1{RESET}")
     print(f"{BOLD}{GREEN}{bar}{RESET}")
-    print(f"  Model  : {model}")
-    print(f"  Specs  : {specs_dir}")
-    print(f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"  Input  : {input_req[:100].strip()}...")
+    print(f"  Model      : {model}")
+    print(f"  Specs      : {specs_dir}")
+    print(f"  Max tokens : {max_tokens}")
+    print(f"  From phase : {from_phase}")
+    print(f"  Started    : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  Input      : {input_req[:100].strip()}...")
     print(f"{BOLD}{GREEN}{bar}{RESET}\n")
 
-    # ── Run all phases ──────────────────────────────────────────────────────
-    discovery     = run_discovery(client, specs_dir, input_req)
-    requirements  = run_requirements(client, specs_dir, discovery)
-    hld           = run_hld(client, specs_dir, discovery, requirements)
-    lld_results   = run_lld(client, specs_dir, hld, requirements, discovery)
-    review        = run_review(client, specs_dir, discovery, requirements, hld, lld_results)
+    if from_phase > 0:
+        info(f"Resuming from Phase {from_phase} — reading existing artifacts for earlier phases.")
+
+    # ── Phase 0 ─────────────────────────────────────────────────────────────
+    if from_phase <= 0:
+        discovery = run_discovery(client, specs_dir, input_req, model, max_tokens)
+    else:
+        discovery = (specs_dir / "discovery.md").read_text(encoding="utf-8")
+        ok("Phase 0: loaded existing discovery.md")
+
+    # ── Phase 1 ─────────────────────────────────────────────────────────────
+    if from_phase <= 1:
+        requirements = run_requirements(client, specs_dir, discovery, model, max_tokens)
+    else:
+        requirements = (specs_dir / "requirements.md").read_text(encoding="utf-8")
+        ok("Phase 1: loaded existing requirements.md")
+
+    # ── Phase 2 ─────────────────────────────────────────────────────────────
+    if from_phase <= 2:
+        hld = run_hld(client, specs_dir, discovery, requirements, model, max_tokens)
+    else:
+        hld = (specs_dir / "Design_HLD.md").read_text(encoding="utf-8")
+        ok("Phase 2: loaded existing Design_HLD.md")
+
+    # ── Phase 3 ─────────────────────────────────────────────────────────────
+    if from_phase <= 3:
+        lld_results = run_lld(client, specs_dir, hld, requirements, discovery, model, max_tokens)
+    else:
+        lld_results = {}
+        for f in specs_dir.glob("Design_LLD_*.md"):
+            lld_results[f.stem.replace("Design_LLD_", "").replace("_", " ")] = f.read_text(encoding="utf-8")
+        ok(f"Phase 3: loaded {len(lld_results)} existing LLD(s)")
+
+    # ── Phase 4 ─────────────────────────────────────────────────────────────
+    review = run_review(client, specs_dir, discovery, requirements, hld, lld_results, model, max_tokens)
 
     # ── Final summary ────────────────────────────────────────────────────────
     print(f"\n{BOLD}{GREEN}{bar}{RESET}")
@@ -580,7 +668,6 @@ def run_pipeline(specs_dir_base: str, model: str = "claude-sonnet-4-6") -> None:
     print(f"{GREEN}  All artifacts written to: {specs_dir}{RESET}")
     print(f"{BOLD}{GREEN}{bar}{RESET}\n")
 
-    # Print review executive summary
     exec_start = review.find("## 1. Executive Summary")
     if exec_start == -1:
         exec_start = review.find("## Executive Summary")
@@ -589,7 +676,7 @@ def run_pipeline(specs_dir_base: str, model: str = "claude-sonnet-4-6") -> None:
         print()
 
 
-def run_review_only(specs_dir_base: str, model: str = "claude-sonnet-4-6") -> None:
+def run_review_only(specs_dir_base: str, model: str = "claude-sonnet-4-6", max_tokens: int = 16000) -> None:
     """
     Run only Phase 4 (Review) against existing .specs/ artifacts.
     Useful for re-auditing after manual edits.
@@ -602,21 +689,17 @@ def run_review_only(specs_dir_base: str, model: str = "claude-sonnet-4-6") -> No
     client = anthropic.Anthropic(api_key=api_key)
     specs_dir = Path(specs_dir_base) / ".specs"
 
-    def load(fname):
-        return read_file(specs_dir / fname)
+    discovery    = (specs_dir / "discovery.md").read_text(encoding="utf-8") if (specs_dir / "discovery.md").exists() else ""
+    requirements = (specs_dir / "requirements.md").read_text(encoding="utf-8") if (specs_dir / "requirements.md").exists() else ""
+    hld          = (specs_dir / "Design_HLD.md").read_text(encoding="utf-8") if (specs_dir / "Design_HLD.md").exists() else ""
 
-    discovery    = load("discovery.md")
-    requirements = load("requirements.md")
-    hld          = load("Design_HLD.md")
-
-    # Collect all LLD files
-    lld_results: dict[str, str] = {}
+    lld_results: dict = {}
     for f in specs_dir.glob("Design_LLD_*.md"):
-        lld_results[f.stem.replace("Design_LLD_", "").replace("_", " ")] = read_file(f)
+        lld_results[f.stem.replace("Design_LLD_", "").replace("_", " ")] = f.read_text(encoding="utf-8")
 
     if not any([discovery, requirements, hld]):
         err("No artifacts found. Run 'archpilot run' first to generate them.")
         sys.exit(1)
 
-    run_review(client, specs_dir, discovery, requirements, hld, lld_results)
+    run_review(client, specs_dir, discovery, requirements, hld, lld_results, model, max_tokens)
     ok("Review report written to .specs/review_report.md")

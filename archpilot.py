@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Archpilot CLI v4.0
+Archpilot CLI v4.1
 Commands:
   init    — scaffold .specs/ directory structure
   lint    — validate .specs/ against enterprise standards (tiers 1-3)
@@ -11,7 +11,10 @@ Commands:
 import os
 import sys
 import re
+import json
 import argparse
+
+__version__ = "4.1.0"
 
 
 # ─── INIT ────────────────────────────────────────────────────────────────────
@@ -63,12 +66,13 @@ def init_project(target_dir: str) -> None:
         else:
             print(f"  [SKIP] Exists   {filepath}")
 
+    prog = os.path.basename(sys.argv[0])
     print(
         f"\n[OK] Project initialized at {specs_dir}\n"
         "  Next steps:\n"
-        "  1. Edit .specs/Input.md  -- add your high-level requirement\n"
-        "  2. Edit .specs/constitution.md -- set hard constraints and tech preferences\n"
-        "  3. Run: python archpilot.py run\n"
+        "  1. Edit .specs/Input.md        — add your high-level requirement\n"
+        "  2. Edit .specs/constitution.md — set hard constraints and tech preferences\n"
+        f"  3. Run: {prog} run\n"
     )
 
 
@@ -79,42 +83,54 @@ WEAK_WORDS = [
     "highly-available", "performant", "robust", "seamless", "modern",
 ]
 
-def lint_specs(target_dir: str, tier: int = 2) -> None:
+def _strip_code_blocks(text: str) -> str:
+    """Remove fenced code blocks so lint rules don't fire on code samples."""
+    return re.sub(r'```.*?```', '', text, flags=re.DOTALL)
+
+def lint_specs(target_dir: str, tier: int = 2, fmt: str = "text") -> None:
     """Lint .specs/ for structural and quality violations."""
     specs_dir = os.path.join(target_dir, ".specs")
     if not os.path.exists(specs_dir):
-        print(f"Error: {specs_dir} does not exist. Run 'init' first.")
+        _lint_out(fmt, [], [], "lint", f"{specs_dir} does not exist. Run 'init' first.")
         sys.exit(1)
 
-    errors   = 0
-    warnings = 0
+    error_list = []
+    warn_list  = []
 
-    print(f"\nRunning Archpilot Linter (Tier {tier})...")
-    print("-" * 50)
+    def add_error(msg): error_list.append(msg)
+    def add_warn(msg):  warn_list.append(msg)
 
-    # -- Rule 1: No TODOs, TBDs, placeholders -----------------------------
+    if fmt == "text":
+        print(f"\nRunning Archpilot Linter (Tier {tier})...")
+        print("-" * 50)
+
+    # -- Rule 1: No TODOs, TBDs, placeholders ---------------------------------
     for filename in sorted(os.listdir(specs_dir)):
         if not filename.endswith(".md"):
             continue
         filepath = os.path.join(specs_dir, filename)
         with open(filepath, "r", encoding="utf-8") as f:
-            lines = f.readlines()
+            raw = f.read()
+        lines_raw = raw.splitlines()
+        plain = _strip_code_blocks(raw)
+        lines  = plain.splitlines()
+
+        for i, line in enumerate(lines_raw, 1):
+            if re.search(r'\b(TODO|TBD|FIXME)\b', line, re.IGNORECASE):
+                add_error(f"{filename}:{i}  Unresolved: '{line.strip()}'")
+            if re.search(r'\[Your .+? here\]|\[placeholder\]|\[TBD\]', line, re.IGNORECASE):
+                add_error(f"{filename}:{i}  Unfilled placeholder: '{line.strip()}'")
 
         for i, line in enumerate(lines, 1):
-            if re.search(r'\b(TODO|TBD|FIXME)\b', line, re.IGNORECASE):
-                print(f"  [ERROR] {filename}:{i}  Unresolved: '{line.strip()}'")
-                errors += 1
-
-            if re.search(r'\[Your .+? here\]|\[placeholder\]|\[TBD\]', line, re.IGNORECASE):
-                print(f"  [ERROR] {filename}:{i}  Unfilled placeholder: '{line.strip()}'")
-                errors += 1
-
             for word in WEAK_WORDS:
                 if re.search(rf'\b{word}\b', line, re.IGNORECASE):
-                    print(f"  [ERROR] {filename}:{i}  Vague adjective '{word}' — use a quantified NFR (Rule 00:1.5).")
-                    errors += 1
+                    msg = f"{filename}:{i}  Vague adjective '{word}' — use a quantified NFR (Rule 00:1.5)."
+                    if tier >= 2:
+                        add_error(msg)
+                    else:
+                        add_warn(msg)
 
-    # -- Rule 2: Discovery dimension count (Tier 3: >=10) ------------------
+    # -- Rule 2: Discovery dimension count ------------------------------------
     discovery_file = os.path.join(specs_dir, "discovery.md")
     if os.path.exists(discovery_file):
         with open(discovery_file, encoding="utf-8") as f:
@@ -127,17 +143,14 @@ def lint_specs(target_dir: str, tier: int = 2) -> None:
             content, re.MULTILINE | re.IGNORECASE
         ))
         if tier == 3 and dim_count < 10:
-            print(f"  [ERROR] discovery.md has {dim_count} dimensions — Tier 3 requires ≥10 (Rule 50).")
-            errors += 1
-        elif tier == 2 and dim_count < 5:
-            print(f"  [WARN]  discovery.md has only {dim_count} dimensions — recommend ≥10.")
-            warnings += 1
+            add_error(f"discovery.md has {dim_count} dimensions — Tier 3 requires ≥10 (Rule 50).")
+        elif dim_count < 5:
+            add_warn(f"discovery.md has only {dim_count} dimensions — recommend ≥10.")
     else:
         if tier >= 2:
-            print("  [ERROR] discovery.md missing — run 'archpilot run' to generate.")
-            errors += 1
+            add_error("discovery.md missing — run 'archpilot run' to generate.")
 
-    # -- Rule 3: Epic and Story counts ------------------------------------
+    # -- Rule 3: Epic and Story counts ----------------------------------------
     req_file = os.path.join(specs_dir, "requirements.md")
     if os.path.exists(req_file):
         with open(req_file, encoding="utf-8") as f:
@@ -147,17 +160,13 @@ def lint_specs(target_dir: str, tier: int = 2) -> None:
 
         if tier == 3:
             if epic_count < 10:
-                print(f"  [ERROR] requirements.md: {epic_count} Epics — Tier 3 requires 10-20 (Rule 50).")
-                errors += 1
+                add_error(f"requirements.md: {epic_count} Epics — Tier 3 requires 10-20 (Rule 50).")
             if story_count < 50:
-                print(f"  [ERROR] requirements.md: {story_count} Stories — Tier 3 requires 50-150 (Rule 50).")
-                errors += 1
-        elif tier == 2:
-            if epic_count < 5:
-                print(f"  [WARN]  requirements.md: only {epic_count} Epics detected.")
-                warnings += 1
+                add_error(f"requirements.md: {story_count} Stories — Tier 3 requires 50-150 (Rule 50).")
+        elif tier == 2 and epic_count < 5:
+            add_warn(f"requirements.md: only {epic_count} Epics detected.")
 
-    # -- Rule 4: HLD mandatory sections -----------------------------------
+    # -- Rule 4: HLD mandatory sections ---------------------------------------
     design_files = [
         f for f in os.listdir(specs_dir)
         if f.startswith("Design_") and f.endswith(".md")
@@ -168,38 +177,31 @@ def lint_specs(target_dir: str, tier: int = 2) -> None:
             content = f.read()
 
         if "Design Rationale" not in content:
-            print(f"  [ERROR] {filename}: Missing 'Design Rationale' narrative (Rule 50).")
-            errors += 1
+            add_error(f"{filename}: Missing 'Design Rationale' narrative (Rule 50).")
         if "Implementation Strategy" not in content:
-            print(f"  [ERROR] {filename}: Missing 'Implementation Strategy' narrative (Rule 50).")
-            errors += 1
+            add_error(f"{filename}: Missing 'Implementation Strategy' narrative (Rule 50).")
 
         table_count = content.count("|---")
         if tier == 3 and table_count < 2:
-            print(f"  [ERROR] {filename}: Tier 3 requires ≥2 data/API tables.")
-            errors += 1
+            add_error(f"{filename}: Tier 3 requires ≥2 data/API tables.")
 
         if "```mermaid" not in content:
-            print(f"  [WARN]  {filename}: No Mermaid diagram found — diagrams are strongly recommended.")
-            warnings += 1
+            add_warn(f"{filename}: No Mermaid diagram found — diagrams are strongly recommended.")
 
-    # -- Rule 5: Governance artifact presence -----------------------------
-    gov_files = ["assumptions.md", "volumetrics.md", "dependencies.md", "critical_path.md"]
-    for gf in gov_files:
+    # -- Rule 5: Governance artifact presence ---------------------------------
+    for gf in ["assumptions.md", "volumetrics.md", "dependencies.md", "critical_path.md"]:
         if not os.path.exists(os.path.join(specs_dir, gf)):
-            print(f"  [ERROR] Missing governance artifact: {gf}")
-            errors += 1
+            add_error(f"Missing governance artifact: {gf}")
 
-    # ── Rule 6: Task verification (Tier 3) ───────────────────────────────
+    # -- Rule 6: Task verification (Tier 3) -----------------------------------
     task_file = os.path.join(specs_dir, "tasks.md")
     if os.path.exists(task_file):
         with open(task_file, encoding="utf-8") as f:
             content = f.read()
         if tier == 3 and "Verification" not in content and "Acceptance" not in content:
-            print("  [ERROR] tasks.md: Tier 3 requires explicit Verification/Acceptance criteria per task.")
-            errors += 1
+            add_error("tasks.md: Tier 3 requires explicit Verification/Acceptance criteria per task.")
 
-    # ── Rule 7: NFR targets ───────────────────────────────────────────────
+    # -- Rule 7: NFR targets --------------------------------------------------
     for filename in design_files:
         filepath = os.path.join(specs_dir, filename)
         with open(filepath, encoding="utf-8") as f:
@@ -207,37 +209,57 @@ def lint_specs(target_dir: str, tier: int = 2) -> None:
         nfr_section = re.search(r'Non.Functional.*?(?=\n#{1,3} |\Z)', content, re.DOTALL | re.IGNORECASE)
         if nfr_section:
             nfr_text = nfr_section.group()
-            has_numbers = bool(re.search(r'\d+\s*(?:ms|s|%|TPS|RPS|GB|TB|hrs?|days?)', nfr_text))
-            if not has_numbers:
-                print(f"  [WARN]  {filename}: NFR section lacks quantified targets (ms/s/%/TPS).")
-                warnings += 1
+            if not re.search(r'\d+\s*(?:ms|s|%|TPS|RPS|GB|TB|hrs?|days?)', nfr_text):
+                add_warn(f"{filename}: NFR section lacks quantified targets (ms/s/%/TPS).")
 
-    # -- Summary ----------------------------------------------------------
-    print("\n" + "-" * 50)
-    if errors > 0:
-        print(f"  LINT FAILED  — {errors} error(s), {warnings} warning(s).")
-        print("  Block PR from merging until all errors are resolved.")
+    # -- Output ---------------------------------------------------------------
+    _lint_out(fmt, error_list, warn_list, "text" if fmt == "text" else "json")
+
+    if error_list:
         sys.exit(1)
+    sys.exit(0)
+
+
+def _lint_out(fmt: str, errors: list, warnings: list, mode: str, fatal: str = "") -> None:
+    if fatal:
+        if fmt == "json":
+            print(json.dumps({"fatal": fatal, "errors": [], "warnings": []}))
+        else:
+            print(f"Error: {fatal}")
+        return
+
+    if fmt == "json":
+        print(json.dumps({"errors": errors, "warnings": warnings}, indent=2))
+        return
+
+    for msg in errors:
+        print(f"  [ERROR] {msg}")
+    for msg in warnings:
+        print(f"  [WARN]  {msg}")
+
+    print("\n" + "-" * 50)
+    if errors:
+        print(f"  LINT FAILED  — {len(errors)} error(s), {len(warnings)} warning(s).")
+        print("  Block PR from merging until all errors are resolved.")
     else:
-        print(f"  LINT PASSED  — 0 errors, {warnings} warning(s).")
+        print(f"  LINT PASSED  — 0 errors, {len(warnings)} warning(s).")
         print("  Architecture specs meet Archpilot Enterprise Standards.")
-        sys.exit(0)
 
 
 # ─── RUN (agentic pipeline) ───────────────────────────────────────────────────
 
-def run_pipeline_cmd(target_dir: str, model: str) -> None:
+def run_pipeline_cmd(target_dir: str, model: str, from_phase: int, max_tokens: int) -> None:
     """Execute the full 5-stage agentic pipeline."""
     _ensure_pipeline()
     from tools.pipeline import run_pipeline
-    run_pipeline(target_dir, model)
+    run_pipeline(target_dir, model, from_phase=from_phase, max_tokens=max_tokens)
 
 
-def review_cmd(target_dir: str, model: str) -> None:
+def review_cmd(target_dir: str, model: str, max_tokens: int) -> None:
     """Re-run the guardrail review against existing .specs/ artifacts."""
     _ensure_pipeline()
     from tools.pipeline import run_review_only
-    run_review_only(target_dir, model)
+    run_review_only(target_dir, model, max_tokens=max_tokens)
 
 
 def _ensure_pipeline() -> None:
@@ -254,11 +276,12 @@ def _ensure_pipeline() -> None:
 
 # ─── CLI ──────────────────────────────────────────────────────────────────────
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="archpilot",
-        description="Archpilot CLI v4.0 — Enterprise Architecture as Code",
+        description="Archpilot CLI v4.1 — Enterprise Architecture as Code",
     )
+    parser.add_argument("--version", action="version", version=f"archpilot {__version__}")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # init
@@ -267,10 +290,14 @@ if __name__ == "__main__":
 
     # lint
     p_lint = subparsers.add_parser("lint", help="Lint .specs/ for standards violations")
-    p_lint.add_argument("--dir",  default=".", help="Directory containing .specs/")
+    p_lint.add_argument("--dir",    default=".", help="Directory containing .specs/")
     p_lint.add_argument(
         "--tier", type=int, default=2, choices=[1, 2, 3],
         help="Compliance tier 1=Starter, 2=Standard, 3=Enterprise (default: 2)"
+    )
+    p_lint.add_argument(
+        "--format", dest="fmt", default="text", choices=["text", "json"],
+        help="Output format: text (default) or json for CI tooling"
     )
 
     # run
@@ -283,6 +310,15 @@ if __name__ == "__main__":
         "--model", default="claude-sonnet-4-6",
         help="Claude model ID (default: claude-sonnet-4-6)"
     )
+    p_run.add_argument(
+        "--from-phase", type=int, default=0, choices=[0, 1, 2, 3, 4],
+        metavar="N",
+        help="Resume pipeline from phase N (0-4); reads existing artifacts for earlier phases"
+    )
+    p_run.add_argument(
+        "--max-tokens", type=int, default=16000,
+        help="Max output tokens per Claude call (default: 16000)"
+    )
 
     # review
     p_review = subparsers.add_parser(
@@ -294,16 +330,24 @@ if __name__ == "__main__":
         "--model", default="claude-sonnet-4-6",
         help="Claude model ID (default: claude-sonnet-4-6)"
     )
+    p_review.add_argument(
+        "--max-tokens", type=int, default=16000,
+        help="Max output tokens per Claude call (default: 16000)"
+    )
 
     args = parser.parse_args()
 
     if args.command == "init":
         init_project(args.dir)
     elif args.command == "lint":
-        lint_specs(args.dir, args.tier)
+        lint_specs(args.dir, args.tier, args.fmt)
     elif args.command == "run":
-        run_pipeline_cmd(args.dir, args.model)
+        run_pipeline_cmd(args.dir, args.model, args.from_phase, args.max_tokens)
     elif args.command == "review":
-        review_cmd(args.dir, args.model)
+        review_cmd(args.dir, args.model, args.max_tokens)
     else:
         parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
