@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "archpilot"
+version = "4.1.0"
+description = "Enterprise Architecture as Code — 5-phase agentic pipeline and standards library"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = ["anthropic>=0.40.0"]
+
+[project.urls]
+Homepage = "https://gauravs19.github.io/archpilot"
+Repository = "https://github.com/gauravs19/archpilot"
+"Bug Tracker" = "https://github.com/gauravs19/archpilot/issues"
+
+[project.scripts]
+archpilot = "archpilot:main"
+
+[tool.setuptools.packages.find]
+include = ["tools*"]
+
+[tool.setuptools.package-data]
+"*" = ["rules/*.md", "templates/*.md", "llm-configs/**/*.md"]
