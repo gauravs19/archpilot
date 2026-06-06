@@ -35,12 +35,15 @@ Tools exposed
 -------------
   list_rules()                     — structured index of all rules
   get_rule(name)                   — fetch a single rule by filename or number
+  search_rules(query)              — keyword search across all rule content
   list_templates()                 — index of all templates
+  list_personas()                  — list available persona slugs
   run_lint(directory, tier)        — run archpilot lint and return JSON results
   calculate_nfrs(tps, payload_kb, retention_days, latency_ms, sla, rw_ratio)
                                    — run the NFR physics calculator
 """
 
+import re
 import sys
 import json
 import subprocess
@@ -193,6 +196,43 @@ def get_rule(name: str) -> str:
             })
         path = matches[0]
     return _read(path)
+
+@mcp.tool()
+def search_rules(query: str) -> str:
+    """
+    Search all Archpilot rule files for a keyword or phrase.
+    Returns a JSON list of matching rules with the file name, a description,
+    and the first matching excerpt (up to 200 chars).
+
+    Args:
+        query: Keyword or phrase to search for (case-insensitive).
+               Examples: "circuit breaker", "STRIDE", "multi-tenant", "SLA"
+    """
+    if not query or len(query.strip()) < 2:
+        return json.dumps({"error": "query must be at least 2 characters."})
+
+    pattern = re.compile(re.escape(query.strip()), re.IGNORECASE)
+    results = []
+    for f in sorted(RULES_DIR.glob("*.md")):
+        try:
+            text = f.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if pattern.search(text):
+            # Find first matching excerpt
+            m = pattern.search(text)
+            start = max(0, m.start() - 60)
+            end   = min(len(text), m.end() + 140)
+            excerpt = text[start:end].replace("\n", " ").strip()
+            results.append({
+                "file":    f.name,
+                "description": _rule_description(f.stem),
+                "excerpt": f"...{excerpt}...",
+            })
+
+    if not results:
+        return json.dumps({"query": query, "matches": 0, "results": []})
+    return json.dumps({"query": query, "matches": len(results), "results": results}, indent=2)
 
 @mcp.tool()
 def list_templates() -> str:

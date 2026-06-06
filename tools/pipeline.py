@@ -163,7 +163,7 @@ OUTPUT RULES
 - Finish with "## Interrogation List" — the exact questions the client must answer before Phase 1.
 """
 
-def run_discovery(client, specs_dir: Path, input_req: str, model: str, max_tokens: int) -> str:
+def run_discovery(client, specs_dir: Path, input_req: str, model: str, max_tokens: int, persona: str = "") -> str:
     banner(0, "SE Agent — Deep Discovery (15 Dimensions)")
     info("Analysing requirement across all 15 mandatory dimensions...")
 
@@ -182,7 +182,7 @@ RULE 50 — Pipeline Governance Constraints:
 
 Produce the complete discovery.md. Minimum 15 dimensions. No placeholders. No TODOs.
 """
-    result = call_claude(client, _DISCOVERY_SYSTEM, user_msg, model, max_tokens)
+    result = call_claude(client, _inject_persona(_DISCOVERY_SYSTEM, persona), user_msg, model, max_tokens)
     write_artifact(specs_dir, "discovery.md", result)
     return result
 
@@ -230,7 +230,7 @@ QUALITY GATES
 - Every story must link back to a discovery dimension via a [DIM-XX] tag.
 """
 
-def run_requirements(client, specs_dir: Path, discovery_content: str, model: str, max_tokens: int) -> str:
+def run_requirements(client, specs_dir: Path, discovery_content: str, model: str, max_tokens: int, persona: str = "") -> str:
     banner(1, "PO Agent — Requirements Breakdown")
     info("Generating categorized multi-level requirements (10-20 Epics, 50-150 Stories)...")
 
@@ -249,7 +249,7 @@ RULE 50 — Pipeline Constraints:
 
 Generate requirements.md. 10-20 Epics. 50-150 Stories. Every story fully populated. No placeholders.
 """
-    result = call_claude(client, _REQUIREMENTS_SYSTEM, user_msg, model, max_tokens)
+    result = call_claude(client, _inject_persona(_REQUIREMENTS_SYSTEM, persona), user_msg, model, max_tokens)
     write_artifact(specs_dir, "requirements.md", result)
     return result
 
@@ -292,7 +292,7 @@ ARCHITECTURE STANDARDS
 - Call out anti-patterns explicitly where they were avoided and why.
 """
 
-def run_hld(client, specs_dir: Path, discovery_content: str, requirements_content: str, model: str, max_tokens: int) -> str:
+def run_hld(client, specs_dir: Path, discovery_content: str, requirements_content: str, model: str, max_tokens: int, persona: str = "") -> str:
     banner(2, "Arch Agent — High-Level Design")
     info("Generating HLD (14 sections, C4 diagrams, NFRs, cost estimate)...")
 
@@ -321,7 +321,7 @@ RULE 09 — Microservices Patterns:
 Produce the complete Design_HLD.md. All 14 sections mandatory. Mermaid diagrams must be syntactically valid.
 Include real technology choices with rationale. No placeholders.
 """
-    result = call_claude(client, _HLD_SYSTEM, user_msg, model, max_tokens)
+    result = call_claude(client, _inject_persona(_HLD_SYSTEM, persona), user_msg, model, max_tokens)
     write_artifact(specs_dir, "Design_HLD.md", result)
     return result
 
@@ -416,7 +416,7 @@ Produce the complete LLD for "{svc}". All 12 sections mandatory.
 Include sequence diagrams, DB schema with indexes, API specs with examples.
 All numeric thresholds explicit (no TBD). No placeholders.
 """
-    result = call_claude(client, _LLD_SYSTEM, user_msg, model, max_tokens)
+    result = call_claude(client, _inject_persona(_LLD_SYSTEM, ""), user_msg, model, max_tokens)
     fname = f"Design_LLD_{safe}.md"
     write_artifact(specs_dir, fname, result)
     return svc, result
@@ -568,7 +568,7 @@ Produce the complete review_report.md.
 - Every finding must cite: artifact name, section heading, and specific line/claim.
 - Recommended fixes must be actionable (not generic advice).
 """
-    result = call_claude(client, _REVIEW_SYSTEM, user_msg, model, max_tokens)
+    result = call_claude(client, _inject_persona(_REVIEW_SYSTEM, ""), user_msg, model, max_tokens)
     write_artifact(specs_dir, "review_report.md", result)
     return result
 
@@ -577,11 +577,37 @@ Produce the complete review_report.md.
 # MAIN PIPELINE RUNNER
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def _load_persona(persona: str | None) -> str:
+    """Read persona file content; return empty string if persona is None or file missing."""
+    if not persona:
+        return ""
+    path = ARCHPILOT_ROOT / "llm-configs" / "personas" / f"{persona}.md"
+    if not path.exists():
+        warn(f"Persona file not found: {path.name} — running without persona overlay.")
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+def _inject_persona(system_prompt: str, persona_content: str) -> str:
+    """Prepend persona content to a system prompt if provided."""
+    if not persona_content:
+        return system_prompt
+    return f"PERSONA & COMMUNICATION STYLE\n{persona_content}\n\n---\n\n{system_prompt}"
+
+
+def _elapsed(seconds: float) -> str:
+    """Human-readable elapsed time: '1m 23s' or '45s'."""
+    m, s = divmod(int(seconds), 60)
+    return f"{m}m {s:02d}s" if m else f"{s}s"
+
+
 def run_pipeline(
     specs_dir_base: str,
     model: str = "claude-sonnet-4-6",
     from_phase: int = 0,
     max_tokens: int = 16000,
+    persona: str | None = None,
+    dry_run: bool = False,
 ) -> None:
     """
     Execute the full 5-stage Archpilot agentic pipeline.
@@ -591,13 +617,15 @@ def run_pipeline(
         model:          Claude model ID
         from_phase:     resume from this phase (0-4); reads existing artifacts for earlier phases
         max_tokens:     maximum output tokens per Claude call
+        persona:        optional persona slug to tune agent communication style
+        dry_run:        if True, print what each phase would do without calling Claude
     """
     api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
+    if not api_key and not dry_run:
         err("ANTHROPIC_API_KEY is not set. Export it before running the pipeline.")
         sys.exit(1)
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = anthropic.Anthropic(api_key=api_key or "dry-run") if not dry_run else None
     specs_dir = Path(specs_dir_base) / ".specs"
 
     if not specs_dir.exists():
@@ -614,14 +642,18 @@ def run_pipeline(
         err("Input.md is too short. Provide a meaningful high-level requirement (min 50 chars).")
         sys.exit(1)
 
+    persona_content = _load_persona(persona)
+
     bar = "═" * 62
     print(f"\n{BOLD}{GREEN}{bar}{RESET}")
-    print(f"{BOLD}{GREEN}  Archpilot Agentic Pipeline v4.1{RESET}")
+    print(f"{BOLD}{GREEN}  Archpilot Agentic Pipeline v4.2{RESET}")
     print(f"{BOLD}{GREEN}{bar}{RESET}")
     print(f"  Model      : {model}")
     print(f"  Specs      : {specs_dir}")
     print(f"  Max tokens : {max_tokens}")
     print(f"  From phase : {from_phase}")
+    print(f"  Persona    : {persona or '(none)'}")
+    print(f"  Dry run    : {'yes — no API calls will be made' if dry_run else 'no'}")
     print(f"  Started    : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"  Input      : {input_req[:100].strip()}...")
     print(f"{BOLD}{GREEN}{bar}{RESET}\n")
@@ -629,30 +661,59 @@ def run_pipeline(
     if from_phase > 0:
         info(f"Resuming from Phase {from_phase} — reading existing artifacts for earlier phases.")
 
+    phase_timings: list[tuple[str, float]] = []
+    pipeline_start = time.perf_counter()
+
+    def _timed_phase(label: str, fn, *args, **kwargs):
+        """Run a pipeline phase and record elapsed time."""
+        t0 = time.perf_counter()
+        if dry_run:
+            print(f"  {DIM}[dry-run] Would run: {label}{RESET}")
+            return ""
+        result = fn(*args, **kwargs)
+        elapsed = time.perf_counter() - t0
+        phase_timings.append((label, elapsed))
+        ok(f"{label} completed in {_elapsed(elapsed)}")
+        return result
+
     # ── Phase 0 ─────────────────────────────────────────────────────────────
     if from_phase <= 0:
-        discovery = run_discovery(client, specs_dir, input_req, model, max_tokens)
+        discovery = _timed_phase(
+            "Phase 0: SE Agent — Deep Discovery",
+            run_discovery, client, specs_dir, input_req, model, max_tokens, persona_content,
+        )
     else:
         discovery = (specs_dir / "discovery.md").read_text(encoding="utf-8")
         ok("Phase 0: loaded existing discovery.md")
 
     # ── Phase 1 ─────────────────────────────────────────────────────────────
     if from_phase <= 1:
-        requirements = run_requirements(client, specs_dir, discovery, model, max_tokens)
+        requirements = _timed_phase(
+            "Phase 1: PO Agent — Requirements Breakdown",
+            run_requirements, client, specs_dir, discovery, model, max_tokens, persona_content,
+        )
     else:
         requirements = (specs_dir / "requirements.md").read_text(encoding="utf-8")
         ok("Phase 1: loaded existing requirements.md")
 
     # ── Phase 2 ─────────────────────────────────────────────────────────────
     if from_phase <= 2:
-        hld = run_hld(client, specs_dir, discovery, requirements, model, max_tokens)
+        hld = _timed_phase(
+            "Phase 2: Arch Agent — High-Level Design",
+            run_hld, client, specs_dir, discovery, requirements, model, max_tokens, persona_content,
+        )
     else:
         hld = (specs_dir / "Design_HLD.md").read_text(encoding="utf-8")
         ok("Phase 2: loaded existing Design_HLD.md")
 
     # ── Phase 3 ─────────────────────────────────────────────────────────────
     if from_phase <= 3:
-        lld_results = run_lld(client, specs_dir, hld, requirements, discovery, model, max_tokens)
+        lld_results = _timed_phase(
+            "Phase 3: Arch Agent — Low-Level Designs",
+            run_lld, client, specs_dir, hld, requirements, discovery, model, max_tokens,
+        )
+        if dry_run:
+            lld_results = {}
     else:
         lld_results = {}
         for f in specs_dir.glob("Design_LLD_*.md"):
@@ -660,20 +721,30 @@ def run_pipeline(
         ok(f"Phase 3: loaded {len(lld_results)} existing LLD(s)")
 
     # ── Phase 4 ─────────────────────────────────────────────────────────────
-    review = run_review(client, specs_dir, discovery, requirements, hld, lld_results, model, max_tokens)
+    review = _timed_phase(
+        "Phase 4: Review Agent — Guardrail Audit",
+        run_review, client, specs_dir, discovery, requirements, hld, lld_results, model, max_tokens,
+    )
+
+    total_elapsed = time.perf_counter() - pipeline_start
 
     # ── Final summary ────────────────────────────────────────────────────────
     print(f"\n{BOLD}{GREEN}{bar}{RESET}")
-    print(f"{BOLD}{GREEN}  Pipeline Complete!{RESET}")
+    print(f"{BOLD}{GREEN}  Pipeline Complete!  (total: {_elapsed(total_elapsed)}){RESET}")
+    if phase_timings:
+        print(f"{GREEN}  Phase timings:{RESET}")
+        for label, secs in phase_timings:
+            print(f"    {label:<45} {_elapsed(secs):>6}")
     print(f"{GREEN}  All artifacts written to: {specs_dir}{RESET}")
     print(f"{BOLD}{GREEN}{bar}{RESET}\n")
 
-    exec_start = review.find("## 1. Executive Summary")
-    if exec_start == -1:
-        exec_start = review.find("## Executive Summary")
-    if exec_start > -1:
-        print(review[exec_start : exec_start + 600])
-        print()
+    if review:
+        exec_start = review.find("## 1. Executive Summary")
+        if exec_start == -1:
+            exec_start = review.find("## Executive Summary")
+        if exec_start > -1:
+            print(review[exec_start : exec_start + 600])
+            print()
 
 
 def run_review_only(specs_dir_base: str, model: str = "claude-sonnet-4-6", max_tokens: int = 16000) -> None:

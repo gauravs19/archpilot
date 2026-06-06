@@ -195,19 +195,45 @@ The Review Agent audits 12 dimensions and produces:
 
 ```bash
 # Initialize a project with .specs/ scaffold
-python archpilot.py init <project-name>
+python archpilot.py init [--dir <path>]
 
 # Run the full 5-phase agentic pipeline
-python archpilot.py run <project-dir>
+python archpilot.py run [--dir <path>] [--model <id>] [--from-phase N] \
+                        [--max-tokens N] [--persona <slug>] [--dry-run]
 
 # Run only Phase 4 (review) on existing artifacts
-python archpilot.py review <project-dir>
+python archpilot.py review [--dir <path>] [--model <id>] [--max-tokens N]
 
 # Lint artifacts against guardrail rules
-python archpilot.py lint [--tier 1|2|3] [--dir <path>]
+python archpilot.py lint [--dir <path>] [--tier 1|2|3] [--format text|json]
 
-# Show help
+# Detect drift between LLD spec endpoints and source code
+python archpilot.py drift [--dir <path>] [--src <source-dir>] [--format text|json]
+
+# Show help / version
 python archpilot.py --help
+python archpilot.py --version
+```
+
+### `run` Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--dir` | `.` | Directory containing `.specs/Input.md` |
+| `--model` | `claude-sonnet-4-6` | Claude model ID |
+| `--from-phase N` | `0` | Resume from phase N (0–4); reads existing artifacts for phases < N |
+| `--max-tokens N` | `16000` | Max output tokens per Claude call |
+| `--persona <slug>` | _(none)_ | Inject a persona to tune agent communication style (see Personas) |
+| `--dry-run` | `false` | Print what each phase would do without calling the Claude API |
+
+**Resume example** — regenerate only the HLD and LLD after editing `discovery.md`:
+```bash
+python archpilot.py run --dir my-project --from-phase 2
+```
+
+**Dry-run example** — check pipeline configuration without spending API credits:
+```bash
+python archpilot.py run --dir my-project --dry-run
 ```
 
 ### Lint Tiers
@@ -215,15 +241,115 @@ python archpilot.py --help
 | Tier | What it checks | Use when |
 |------|---------------|----------|
 | `--tier 1` | Placeholder detection (TODO, TBD, FIXME), discovery dimension count | Quick pre-review scan |
-| `--tier 2` | + EARS notation compliance, Epic/Story counts, measurable NFR targets | Before HLD handoff |
-| `--tier 3` | + Vague adjectives (fast/robust/seamless), LLD narrative sections, governance artifacts | Before ARB submission |
+| `--tier 2` | + weak-word errors, Epic/Story counts, measurable NFR targets | Before HLD handoff |
+| `--tier 3` | + LLD narrative sections, governance artifacts, diagram count | Before ARB submission |
+
+```bash
+# Text output (default)
+python archpilot.py lint --tier 2 --dir my-project
+
+# JSON output for CI tools / scripting
+python archpilot.py lint --tier 2 --dir my-project --format json
+```
 
 Lint exits with code 1 on any error — use as a CI gate:
 
 ```yaml
 # .github/workflows/archpilot-lint.yml
 - name: Lint architecture specs
-  run: python archpilot.py lint --tier 3 --dir .specs/
+  run: python archpilot.py lint --tier 2 --dir .
+```
+
+### `drift` Command
+
+Compares API endpoints declared in `Design_LLD_*.md` files against actual HTTP route registrations found in source code (Python/FastAPI/Flask, Node/Express, Go/Gin, Java/Spring).
+
+```bash
+# Auto-detect source directory
+python archpilot.py drift --dir my-project
+
+# Specify source directory explicitly
+python archpilot.py drift --dir my-project --src my-project/src
+
+# JSON output for pipeline integration
+python archpilot.py drift --dir my-project --format json
+```
+
+Exit codes: `0` = no drift, `1` = drift detected.
+
+---
+
+## Personas
+
+Personas tune the communication style and emphasis of every AI agent in the pipeline without changing the underlying quality rules. Pass one with `--persona` when running the pipeline:
+
+```bash
+python archpilot.py run --dir my-project --persona startup-cto
+```
+
+| Persona slug | Best for | Communication style |
+|---|---|---|
+| `enterprise-architect` | Corporate ARB submissions, regulated industries | Formal, multi-stakeholder, ADR-heavy |
+| `startup-cto` | Seed/Series-A products, fast iteration | Pragmatic, MVP-first, cost-aware |
+| `security-architect` | BFSI, healthcare, defence systems | Threat-model-first, zero-trust by default |
+| `presales-solutioner` | RFP responses, client-facing proposals | Business outcome focus, ROI framing |
+| `vibe-code-reviewer` | Developer-facing LLD review | Direct, opinionated, code-idiomatic |
+
+Persona files live in `llm-configs/personas/`. You can edit them or add custom personas — the pipeline picks them up automatically.
+
+---
+
+## MCP Server
+
+Archpilot ships an [MCP](https://modelcontextprotocol.io) server (`mcp_server.py`) that exposes the entire standards library — rules, templates, personas, diagrams — as resources and tools. Any MCP-compatible client (Claude Code, Claude Desktop, Cursor) can read rules on demand without copy-pasting files.
+
+### Setup
+
+Add to your Claude Code settings (`~/.claude/settings.json` or workspace settings):
+
+```json
+{
+  "mcpServers": {
+    "archpilot": {
+      "command": "python",
+      "args": ["/path/to/archpilot/mcp_server.py"]
+    }
+  }
+}
+```
+
+Then restart Claude Code. The server starts automatically via stdio transport.
+
+### Resources
+
+| Resource URI | Returns |
+|---|---|
+| `archpilot://rules/index` | Table of all rules with descriptions |
+| `archpilot://rules/{name}` | Full content of a rule (e.g. `03-hld-standards.md` or just `03`) |
+| `archpilot://templates/index` | Table of all templates |
+| `archpilot://templates/{name}` | Full content of a template |
+| `archpilot://personas/{name}` | Full content of a persona file |
+| `archpilot://diagrams/{name}` | Mermaid archetype diagram |
+
+### Tools
+
+| Tool | Description |
+|---|---|
+| `list_rules()` | Structured index of all rules — call this first to discover what's available |
+| `get_rule(name)` | Fetch a rule by filename or numeric prefix (`"03"` → `03-hld-standards.md`) |
+| `search_rules(query)` | Full-text keyword search across all rule files — returns file, description, and matching excerpt |
+| `list_templates()` | Index of all templates |
+| `list_personas()` | List available persona slugs |
+| `run_lint(directory, tier)` | Run archpilot lint and return structured JSON results |
+| `calculate_nfrs(tps, payload_kb, retention_days, ...)` | Run the NFR physics calculator (50+ metrics) |
+
+**Example Claude Code session:**
+
+```
+User: What does Rule 07 say about zero-trust?
+
+Claude Code: [calls get_rule("07")]
+             "Rule 07-security-architecture.md: All services must assume zero-trust..."
 ```
 
 ---
@@ -394,6 +520,12 @@ Not every engagement needs all 36 rules. Use this table to pick the right subset
 | Platform engineering | 30, 13, 24 |
 | Enterprise governance | 18, 02, 23 |
 | Agentic pipeline (full) | 50 (orchestrates all above) |
+
+---
+
+## Rule Numbering
+
+Rules are numbered `00`–`37` and `50`. Numbers 38–49 are reserved for domain-specific rule packs that are shipped separately (IoT, BFSI, Healthcare, Government). Rule `50` (`50-agent-pipeline.md`) is intentionally at `50` because it is the orchestration governance rule — it references all other rules and must sit above them numerically to avoid circular references in tooling that sorts by prefix.
 
 ---
 

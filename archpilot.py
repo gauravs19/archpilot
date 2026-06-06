@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Archpilot CLI v4.1
+Archpilot CLI v4.2
 Commands:
   init    — scaffold .specs/ directory structure
   lint    — validate .specs/ against enterprise standards (tiers 1-3)
   run     — execute the full 5-stage agentic pipeline (requires ANTHROPIC_API_KEY)
   review  — re-run guardrail audit on existing .specs/ artifacts
+  drift   — detect drift between LLD API specs and actual source code
 """
 
 import os
@@ -14,7 +15,7 @@ import re
 import json
 import argparse
 
-__version__ = "4.1.0"
+__version__ = "4.2.0"
 
 
 # ─── INIT ────────────────────────────────────────────────────────────────────
@@ -248,11 +249,27 @@ def _lint_out(fmt: str, errors: list, warnings: list, mode: str, fatal: str = ""
 
 # ─── RUN (agentic pipeline) ───────────────────────────────────────────────────
 
-def run_pipeline_cmd(target_dir: str, model: str, from_phase: int, max_tokens: int) -> None:
+def run_pipeline_cmd(
+    target_dir: str, model: str, from_phase: int,
+    max_tokens: int, persona: str | None, dry_run: bool,
+) -> None:
     """Execute the full 5-stage agentic pipeline."""
     _ensure_pipeline()
     from tools.pipeline import run_pipeline
-    run_pipeline(target_dir, model, from_phase=from_phase, max_tokens=max_tokens)
+    run_pipeline(
+        target_dir, model,
+        from_phase=from_phase, max_tokens=max_tokens,
+        persona=persona, dry_run=dry_run,
+    )
+
+
+def drift_cmd(target_dir: str, src_dir: str | None, fmt: str) -> None:
+    """Check for drift between LLD spec endpoints and source code."""
+    tools_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools")
+    if tools_dir not in sys.path:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from tools.drift_check import drift_check
+    drift_check(target_dir, src_dir, fmt)
 
 
 def review_cmd(target_dir: str, model: str, max_tokens: int) -> None:
@@ -319,6 +336,29 @@ def main() -> None:
         "--max-tokens", type=int, default=16000,
         help="Max output tokens per Claude call (default: 16000)"
     )
+    p_run.add_argument(
+        "--persona",
+        choices=["enterprise-architect", "startup-cto", "security-architect",
+                 "presales-solutioner", "vibe-code-reviewer"],
+        default=None,
+        help="Inject a persona into agent system prompts to tune their communication style"
+    )
+    p_run.add_argument(
+        "--dry-run", action="store_true",
+        help="Print what each phase would do without calling the Claude API"
+    )
+
+    # drift
+    p_drift = subparsers.add_parser(
+        "drift",
+        help="Detect drift between LLD spec endpoints and source code"
+    )
+    p_drift.add_argument("--dir",    default=".", help="Project root directory (default: current)")
+    p_drift.add_argument("--src",    default=None, help="Source code directory (auto-detected if omitted)")
+    p_drift.add_argument(
+        "--format", dest="fmt", default="text", choices=["text", "json"],
+        help="Output format: text (default) or json"
+    )
 
     # review
     p_review = subparsers.add_parser(
@@ -342,9 +382,14 @@ def main() -> None:
     elif args.command == "lint":
         lint_specs(args.dir, args.tier, args.fmt)
     elif args.command == "run":
-        run_pipeline_cmd(args.dir, args.model, args.from_phase, args.max_tokens)
+        run_pipeline_cmd(
+            args.dir, args.model, args.from_phase, args.max_tokens,
+            getattr(args, "persona", None), getattr(args, "dry_run", False),
+        )
     elif args.command == "review":
         review_cmd(args.dir, args.model, args.max_tokens)
+    elif args.command == "drift":
+        drift_cmd(args.dir, args.src, args.fmt)
     else:
         parser.print_help()
 

@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF_NAME}"          # e.g. v4.1.0
+          VERSION="${TAG#v}"                # e.g. 4.1.0
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          # Extract the block between this version header and the next ---
+          awk "/^## \[$VERSION\]/{found=1; next} found && /^---/{exit} found{print}" CHANGELOG.md \
+            > release_notes.txt
+
+          echo "Release notes:"
+          cat release_notes.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Archpilot ${{ steps.changelog.outputs.version }}"
+          body_path: release_notes.txt
+          draft: false
+          prerelease: false
