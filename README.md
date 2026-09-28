@@ -522,3 +522,4 @@ making enterprise architecture consistent, teachable, and AI-augmented.
 |---|---|
 | [archpilot-cli](https://github.com/gauravs19/archpilot-cli) | CLI to scaffold architecture documents from this standards library |
 | [archpilot-reviewer](https://github.com/gauravs19/archpilot-reviewer) | GitHub Action for automated architecture governance on PRs |
+| [MySpec](https://myspec.dev) | Interactive requirements discovery & 4-file spec compiler (`constitution.md`, `requirements.md`, `solution.md`, `tasks.md`) with native MCP server integration |
